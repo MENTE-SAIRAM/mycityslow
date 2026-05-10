@@ -1,6 +1,5 @@
 package com.mycityslow.app.presentation.navigation
 
-import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Explore
@@ -17,8 +16,8 @@ sealed class Screen(val route: String) {
     object Discovery : Screen("discovery")
     object Experiences : Screen("experiences")
     object MyList : Screen("my_list")
-    object SpotDetail : Screen("spot_detail/{slug}") {
-        fun createRoute(slug: String) = "spot_detail/${Uri.encode(slug)}"
+    object SpotDetail : Screen("spot_detail/{id}") {
+        fun createRoute(id: String) = "spot_detail/$id"
     }
     object ExperienceDetail : Screen("experience_detail/{id}") {
         fun createRoute(id: String) = "experience_detail/$id"

@@ -8,7 +8,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,7 +29,7 @@ import com.mycityslow.app.presentation.theme.Terracotta
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpotDetailScreen(
-    slug: String,
+    spotId: String,
     onBack: () -> Unit,
     viewModel: SpotDetailViewModel = hiltViewModel(),
 ) {
@@ -39,14 +41,14 @@ fun SpotDetailScreen(
                 title = { Text(state.spot?.name ?: "") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.toggleSave() }) {
                         Icon(
-                            imageVector = if (state.isSaved) Icons.Default.Bookmark
-                            else Icons.Default.BookmarkBorder,
+                            imageVector = if (state.isSaved) Icons.Filled.Bookmark
+                            else Icons.Filled.BookmarkBorder,
                             contentDescription = "Save",
                             tint = if (state.isSaved) Terracotta else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -77,16 +79,7 @@ fun SpotDetailScreen(
                         .padding(padding),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            state.error ?: "Spot not found",
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        TextButton(onClick = { viewModel.loadSpot() }) {
-                            Text("Retry")
-                        }
-                    }
+                    Text("Spot not found", color = MaterialTheme.colorScheme.error)
                 }
             }
             else -> {
@@ -109,9 +102,7 @@ fun SpotDetailScreen(
 
                     Column(modifier = Modifier.padding(20.dp)) {
                         // Title + Peace Score
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = spot.name,
@@ -124,7 +115,6 @@ fun SpotDetailScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
-                            // Peace score circle
                             Box(
                                 modifier = Modifier
                                     .size(72.dp)
@@ -133,10 +123,7 @@ fun SpotDetailScreen(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        text = "☮",
-                                        style = MaterialTheme.typography.titleMedium,
-                                    )
+                                    Text(text = "☮", style = MaterialTheme.typography.titleMedium)
                                     Text(
                                         text = "${spot.peaceScore}",
                                         style = MaterialTheme.typography.titleLarge,
@@ -149,7 +136,6 @@ fun SpotDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Info chips
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             InfoChip(icon = "🕰️", text = spot.bestTime)
                             InfoChip(icon = "👥", text = spot.crowdLevel)
@@ -158,7 +144,6 @@ fun SpotDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Tags
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             spot.tags.take(6).forEach { tag ->
                                 Surface(
@@ -177,7 +162,6 @@ fun SpotDetailScreen(
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        // Description
                         Text(
                             text = spot.description,
                             style = MaterialTheme.typography.bodyLarge,
@@ -192,7 +176,6 @@ fun SpotDetailScreen(
                             )
                         }
 
-                        // Local Story
                         if (!spot.localStory.isNullOrBlank()) {
                             Spacer(modifier = Modifier.height(24.dp))
                             Card(
@@ -217,7 +200,6 @@ fun SpotDetailScreen(
                             }
                         }
 
-                        // Map placeholder
                         Spacer(modifier = Modifier.height(24.dp))
                         Card(
                             shape = RoundedCornerShape(16.dp),
@@ -246,15 +228,7 @@ fun SpotDetailScreen(
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(
-                                            text = "🗺️",
-                                            style = MaterialTheme.typography.displaySmall,
-                                        )
-                                        Text(
-                                            text = "Map View (Google Maps)",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        )
+                                        Text(text = "🗺️", style = MaterialTheme.typography.displaySmall)
                                         Text(
                                             text = "${spot.location.lat}, ${spot.location.lng}",
                                             style = MaterialTheme.typography.bodySmall,
@@ -265,7 +239,6 @@ fun SpotDetailScreen(
                             }
                         }
 
-                        // Traveler types
                         if (spot.travelerTypes.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(20.dp))
                             Text(

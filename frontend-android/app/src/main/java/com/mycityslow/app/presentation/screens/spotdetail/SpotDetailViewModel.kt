@@ -1,6 +1,5 @@
 package com.mycityslow.app.presentation.screens.spotdetail
 
-import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,7 +23,7 @@ class SpotDetailViewModel @Inject constructor(
     private val spotRepository: SpotRepository,
 ) : ViewModel() {
 
-    private val slug: String = Uri.decode(savedStateHandle.get<String>("slug") ?: "")
+    private val spotId: String = savedStateHandle.get<String>("id") ?: ""
 
     private val _uiState = MutableStateFlow(SpotDetailUiState())
     val uiState: StateFlow<SpotDetailUiState> = _uiState.asStateFlow()
@@ -35,15 +34,9 @@ class SpotDetailViewModel @Inject constructor(
 
     fun loadSpot() {
         viewModelScope.launch {
-            if (slug.isBlank()) {
-                _uiState.update {
-                    it.copy(isLoading = false, error = "Invalid spot link")
-                }
-                return@launch
-            }
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val spot = spotRepository.getSpotBySlug(slug)
+                val spot = spotRepository.getSpotById(spotId)
                 val saved = spot?.id?.let { spotRepository.isSpotSaved(it) } ?: false
                 _uiState.update {
                     it.copy(spot = spot, isLoading = false, isSaved = saved)

@@ -166,7 +166,7 @@ fun HomeScreen(
                             spot = spot,
                             onClick = {
                                 if (spot.slug.isNotBlank()) {
-                                    onSpotClick(spot.slug)
+                                    onSpotClick(spot.id)
                                 }
                             },
                             modifier = Modifier.width(280.dp),

@@ -13,6 +13,20 @@ data class PaginatedResponseDto<T>(
     @SerializedName("pagination") val pagination: PaginationDto,
 )
 
+data class ExperiencesResponseDto(
+    @SerializedName("experiences") val experiences: List<ExperienceDto>,
+    @SerializedName("pagination") val pagination: PaginationDto?,
+)
+
+data class StoriesResponseDto(
+    @SerializedName("stories") val stories: List<LocalStoryDto>,
+    @SerializedName("pagination") val pagination: PaginationDto?,
+)
+
+data class GuidesResponseDto(
+    @SerializedName("guides") val guides: List<CuratedGuideDto>,
+)
+
 data class PaginationDto(
     @SerializedName("page") val page: Int,
     @SerializedName("limit") val limit: Int,

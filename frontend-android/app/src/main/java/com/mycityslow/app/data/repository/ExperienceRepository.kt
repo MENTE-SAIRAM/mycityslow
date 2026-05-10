@@ -23,7 +23,7 @@ class ExperienceRepository @Inject constructor(
             travelerType = travelerType,
             priceRange = priceRange,
         )
-        return response.data?.map { it.toDomain() } ?: emptyList()
+        return response.data?.experiences?.map { it.toDomain() } ?: emptyList()
     }
 
     suspend fun getExperienceById(id: String): Experience? {

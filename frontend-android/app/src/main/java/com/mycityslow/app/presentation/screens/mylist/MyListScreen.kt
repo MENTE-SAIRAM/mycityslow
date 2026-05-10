@@ -121,7 +121,7 @@ fun MyListScreen(
                             spot = spot,
                             onClick = {
                                 if (spot.slug.isNotBlank()) {
-                                    onSpotClick(spot.slug)
+                                    onSpotClick(spot.id)
                                 }
                             },
                         )

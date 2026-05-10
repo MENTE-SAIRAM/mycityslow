@@ -124,15 +124,15 @@ fun NavGraph(
             // Main tabs
             composable(Screen.Home.route) {
                 HomeScreen(
-                    onSpotClick = { slug ->
-                        navController.navigate(Screen.SpotDetail.createRoute(slug))
+                    onSpotClick = { id ->
+                        navController.navigate(Screen.SpotDetail.createRoute(id))
                     }
                 )
             }
             composable(Screen.Discovery.route) {
                 DiscoveryScreen(
-                    onSpotClick = { slug ->
-                        navController.navigate(Screen.SpotDetail.createRoute(slug))
+                    onSpotClick = { id ->
+                        navController.navigate(Screen.SpotDetail.createRoute(id))
                     }
                 )
             }
@@ -141,8 +141,8 @@ fun NavGraph(
             }
             composable(Screen.MyList.route) {
                 MyListScreen(
-                    onSpotClick = { slug ->
-                        navController.navigate(Screen.SpotDetail.createRoute(slug))
+                    onSpotClick = { id ->
+                        navController.navigate(Screen.SpotDetail.createRoute(id))
                     }
                 )
             }
@@ -150,11 +150,11 @@ fun NavGraph(
             // Detail screens
             composable(
                 route = Screen.SpotDetail.route,
-                arguments = listOf(navArgument("slug") { type = NavType.StringType })
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { backStackEntry ->
-                val slug = backStackEntry.arguments?.getString("slug") ?: ""
+                val id = backStackEntry.arguments?.getString("id") ?: ""
                 SpotDetailScreen(
-                    slug = slug,
+                    spotId = id,
                     onBack = { navController.popBackStack() }
                 )
             }

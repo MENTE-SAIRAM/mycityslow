@@ -43,15 +43,15 @@ class SpotRepository @Inject constructor(
         return spots.map { it.toDomain(it.id ?: it.idAlt ?: "", savedIds.contains(it.id ?: it.idAlt ?: "")) }
     }
 
-    suspend fun getSpotBySlug(slug: String): Spot? {
-        val cached = spotDao.getSpotBySlug(slug)
+    suspend fun getSpotById(spotId: String): Spot? {
+        val cached = spotDao.getSpotById(spotId)
         if (cached != null) return cached.toDomain()
 
-        val response = api.getSpotBySlug(slug)
+        val response = api.getSpotById(spotId)
         val dto = response.data ?: return null
-        val saved = savedSpotDao.isSpotSaved(dto.id ?: dto.idAlt ?: "")
+        val saved = savedSpotDao.isSpotSaved(spotId)
         spotDao.insertAll(listOf(dto.toEntity()))
-        return dto.toDomain(dto.id ?: dto.idAlt ?: "", saved)
+        return dto.toDomain(spotId, saved)
     }
 
     suspend fun saveSpot(spotId: String) {

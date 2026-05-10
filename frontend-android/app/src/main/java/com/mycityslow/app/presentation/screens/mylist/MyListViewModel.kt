@@ -33,7 +33,7 @@ class MyListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
                 val response = api.getSavedSpots()
-                val spots = response.data?.map { dto ->
+                val spots = response.data?.spots?.map { dto ->
                     Spot(
                         id = dto.id ?: dto.idAlt ?: "",
                         name = dto.name,

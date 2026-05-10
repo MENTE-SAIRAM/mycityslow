@@ -14,8 +14,8 @@ interface ApiService {
     @GET("cities/{slug}")
     suspend fun getCityBySlug(@Path("slug") slug: String): ApiResponseDto<CityDto>
 
-    // Spots
-    @GET("spots/discover")
+    // Spots — discovery endpoints
+    @GET("discovery/spots")
     suspend fun discoverSpots(
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 20,
@@ -28,16 +28,8 @@ interface ApiService {
         @Query("search") search: String? = null,
     ): ApiResponseDto<PaginatedResponseDto<SpotDto>>
 
-    @GET("spots/{slug}")
-    suspend fun getSpotBySlug(@Path("slug") slug: String): ApiResponseDto<SpotDto>
-
-    @GET("spots")
-    suspend fun getSpots(
-        @Query("page") page: Int = 1,
-        @Query("limit") limit: Int = 20,
-        @Query("city") city: String? = null,
-        @Query("category") category: String? = null,
-    ): ApiResponseDto<PaginatedResponseDto<SpotDto>>
+    @GET("discovery/spots/{id}")
+    suspend fun getSpotById(@Path("id") id: String): ApiResponseDto<SpotDto>
 
     // Experiences
     @GET("experiences")
@@ -50,7 +42,7 @@ interface ApiService {
         @Query("travelerType") travelerType: String? = null,
         @Query("priceRange") priceRange: String? = null,
         @Query("search") search: String? = null,
-    ): ApiResponseDto<List<ExperienceDto>>
+    ): ApiResponseDto<ExperiencesResponseDto>
 
     @GET("experiences/{id}")
     suspend fun getExperienceById(@Path("id") id: String): ApiResponseDto<ExperienceDto>
@@ -70,11 +62,11 @@ interface ApiService {
         @Query("city") city: String? = null,
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 20,
-    ): ApiResponseDto<List<LocalStoryDto>>
+    ): ApiResponseDto<StoriesResponseDto>
 
     // Guides
     @GET("guides")
-    suspend fun getGuides(): ApiResponseDto<List<CuratedGuideDto>>
+    suspend fun getGuides(): ApiResponseDto<GuidesResponseDto>
 
     @GET("guides/{citySlug}")
     suspend fun getGuideByCity(@Path("citySlug") citySlug: String): ApiResponseDto<CuratedGuideDto>
@@ -85,7 +77,7 @@ interface ApiService {
         @Query("q") query: String,
     ): ApiResponseDto<Map<String, Any>>
 
-    // Collection / Saved
-    @GET("saved-spots")
-    suspend fun getSavedSpots(): ApiResponseDto<List<SpotDto>>
+    // Collection / Saved (requires auth)
+    @GET("collection")
+    suspend fun getSavedSpots(): ApiResponseDto<PaginatedResponseDto<SpotDto>>
 }
