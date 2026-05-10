@@ -162,4 +162,129 @@ export const adminController = {
             next(error);
         }
     },
+
+    // ─── Experiences ──────────────────────────────────────────
+    async getExperiences(req: Request, res: Response, next: NextFunction) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 20;
+            const result = await adminService.getAllExperiences(page, limit, req.query);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async createExperience(req: Request, res: Response, next: NextFunction) {
+        try {
+            const experience = await adminService.createExperience(req.body);
+            res.status(201).json(experience);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async updateExperience(req: Request, res: Response, next: NextFunction) {
+        try {
+            const experience = await adminService.updateExperience(req.params.id, req.body);
+            res.json(experience);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async deleteExperience(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await adminService.deleteExperience(req.params.id);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async approveExperience(req: Request, res: Response, next: NextFunction) {
+        try {
+            const experience = await adminService.approveExperience(req.params.id);
+            res.json(experience);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async rejectExperience(req: Request, res: Response, next: NextFunction) {
+        try {
+            const experience = await adminService.rejectExperience(req.params.id);
+            res.json(experience);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // ─── Stories ─────────────────────────────────────────────
+    async getStories(req: Request, res: Response, next: NextFunction) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 20;
+            const status = req.query.status as string;
+            const result = await adminService.getAllStories(page, limit, status);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async approveStory(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await adminService.approveStory(req.params.id);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async rejectStory(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await adminService.rejectStory(req.params.id);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    // ─── Curated Guides ──────────────────────────────────────
+    async getGuides(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await adminService.getAllGuides();
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async createGuide(req: Request, res: Response, next: NextFunction) {
+        try {
+            const guide = await adminService.createGuide(req.body);
+            res.status(201).json(guide);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async updateGuide(req: Request, res: Response, next: NextFunction) {
+        try {
+            const guide = await adminService.updateGuide(req.params.id, req.body);
+            res.json(guide);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async deleteGuide(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await adminService.deleteGuide(req.params.id);
+            res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
 };

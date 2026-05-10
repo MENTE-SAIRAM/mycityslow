@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// Model: User — registered users and admins
-// ─────────────────────────────────────────────────────────────
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IUser extends Document {
@@ -11,6 +8,7 @@ export interface IUser extends Document {
     city?: string;
     avatar?: string;
     role: 'user' | 'admin';
+    travelerType?: string;
     refreshToken?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -25,6 +23,7 @@ const UserSchema = new Schema<IUser>(
         city: { type: String, trim: true, default: '' },
         avatar: { type: String, default: '' },
         role: { type: String, enum: ['user', 'admin'], default: 'user' },
+        travelerType: { type: String, default: '' },
         refreshToken: { type: String, select: false },
     },
     { timestamps: true },

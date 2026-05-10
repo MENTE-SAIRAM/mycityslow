@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Leaf shape -->
+    <group android:translateX="27" android:translateY="22">
+        <path
+            android:fillColor="#7A9E8E"
+            android:pathData="M27,32C27,32 40,18 54,18C68,18 81,32 81,32C81,32 68,46 54,46C40,46 27,32 27,32Z" />
+        <path
+            android:fillColor="#5A7E6E"
+            android:pathData="M54,18C47,18 40,22 35.5,28C40,32 47,34 54,34C61,34 68,32 72.5,28C68,22 61,18 54,18Z" />
+    </group>
+</vector>

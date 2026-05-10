@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// Model: Spot — peaceful places to discover
-// ─────────────────────────────────────────────────────────────
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface ISpot extends Document {
@@ -8,7 +5,7 @@ export interface ISpot extends Document {
     description: string;
     location: {
         type: 'Point';
-        coordinates: [number, number]; // [longitude, latitude]
+        coordinates: [number, number];
     };
     city: Types.ObjectId;
     categories: string[];
@@ -18,6 +15,10 @@ export interface ISpot extends Document {
     images: string[];
     peaceScore: number;
     activities: string[];
+    travelerTypes: string[];
+    isTouristFriendly: boolean;
+    localStory: string;
+    bestForTravelers: string[];
     submittedBy?: Types.ObjectId;
     isApproved: boolean;
     isFeatured: boolean;
@@ -64,6 +65,10 @@ const SpotSchema = new Schema<ISpot>(
         images: [{ type: String }],
         peaceScore: { type: Number, min: 0, max: 10, default: 7 },
         activities: [{ type: String }],
+        travelerTypes: [{ type: String, enum: ['slow-traveler', 'cultural-explorer', 'foodie', 'photographer', 'wellness-seeker', 'solo-female', 'history-lover'] }],
+        isTouristFriendly: { type: Boolean, default: false },
+        localStory: { type: String, default: '' },
+        bestForTravelers: [{ type: String }],
         submittedBy: { type: Schema.Types.ObjectId, ref: 'User' },
         isApproved: { type: Boolean, default: true },
         isFeatured: { type: Boolean, default: false },
@@ -74,9 +79,7 @@ const SpotSchema = new Schema<ISpot>(
     { timestamps: true },
 );
 
-// Geospatial index for nearby queries
 SpotSchema.index({ location: '2dsphere' });
-// Text index for search
 SpotSchema.index({ title: 'text', description: 'text', address: 'text' });
 
 export const Spot = mongoose.model<ISpot>('Spot', SpotSchema);

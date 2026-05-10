@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My City Slow</string>
+    <string name="greeting_morning">Good Morning</string>
+    <string name="greeting_afternoon">Good Afternoon</string>
+    <string name="greeting_evening">Good Evening</string>
+    <string name="discover_peaceful">Discover Peaceful Spots</string>
+    <string name="authentic_experiences">Authentic Experiences</string>
+    <string name="my_slow_list">My Slow List</string>
+    <string name="use_my_location">Use My Location</string>
+    <string name="first_time_guide">First Time in %s</string>
+</resources>

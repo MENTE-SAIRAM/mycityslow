@@ -47,10 +47,10 @@ export default function Navbar() {
 
     const navLinks = [
         { name: 'Discovery', path: '/discover' },
+        { name: 'Experiences', path: '/experiences' },
+        { name: 'Guides', path: '/guides' },
+        { name: 'Stories', path: '/stories' },
         { name: 'Map', path: '/map' },
-        { name: 'Cities', path: '/cities' },
-        { name: 'Philosophy', path: '/philosophy' },
-        { name: 'About', path: '/about' },
         { name: 'Collection', path: '/collection' },
     ];
 

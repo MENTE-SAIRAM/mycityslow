@@ -20,6 +20,11 @@ import searchRoutes from './modules/search/search.routes';
 import uploadRoutes from './modules/upload/upload.routes';
 import adminRoutes from './modules/admin/admin.routes';
 
+// New feature routes
+import experiencesRoutes from './modules/experiences/experiences.routes';
+import localStoriesRoutes from './modules/local-stories/local-stories.routes';
+import guidesRoutes from './modules/guides/guides.routes';
+
 // Middleware
 import { errorHandler } from './middleware/errorHandler';
 
@@ -80,6 +85,11 @@ app.use('/api/community', communityRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
+
+// New feature routes
+app.use('/api/experiences', experiencesRoutes);
+app.use('/api/stories', localStoriesRoutes);
+app.use('/api/guides', guidesRoutes);
 
 // ─── Health Check ───────────────────────────────────────────
 app.get('/api/health', (_req, res) => {

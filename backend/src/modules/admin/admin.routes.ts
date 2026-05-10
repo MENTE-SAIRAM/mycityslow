@@ -32,6 +32,25 @@ router.get('/submissions', adminController.getSubmissions);
 router.put('/submissions/:id/approve', adminController.approveSubmission);
 router.put('/submissions/:id/reject', adminController.rejectSubmission);
 
+// Experiences management
+router.get('/experiences', adminController.getExperiences);
+router.post('/experiences', adminController.createExperience);
+router.put('/experiences/:id', adminController.updateExperience);
+router.delete('/experiences/:id', adminController.deleteExperience);
+router.put('/experiences/:id/approve', adminController.approveExperience);
+router.put('/experiences/:id/reject', adminController.rejectExperience);
+
+// Stories moderation
+router.get('/stories', adminController.getStories);
+router.put('/stories/:id/approve', adminController.approveStory);
+router.put('/stories/:id/reject', adminController.rejectStory);
+
+// Curated Guides management
+router.get('/guides', adminController.getGuides);
+router.post('/guides', adminController.createGuide);
+router.put('/guides/:id', adminController.updateGuide);
+router.delete('/guides/:id', adminController.deleteGuide);
+
 // Global Settings (Home Page Content)
 router.get('/settings', adminController.getSettings);
 router.put('/settings', adminController.updateSettings);

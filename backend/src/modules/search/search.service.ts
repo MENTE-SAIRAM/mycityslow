@@ -2,23 +2,20 @@
 // Search: Service — search spots and cities
 // ─────────────────────────────────────────────────────────────
 import { Spot } from '../../models/Spot';
+import { Experience } from '../../models/Experience';
 import { City } from '../../models/City';
 
 export const searchService = {
-    /**
-     * Search spots and cities by text query
-     */
     async search(query: string, page: number = 1, limit: number = 20) {
         const skip = (page - 1) * limit;
 
         if (!query || query.trim().length === 0) {
-            return { spots: [], cities: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+            return { spots: [], experiences: [], cities: [], pagination: { page, limit, total: 0, totalPages: 0 } };
         }
 
         const regex = new RegExp(query, 'i');
 
-        // Search spots
-        const [spots, spotCount] = await Promise.all([
+        const [spots, spotCount, experiences] = await Promise.all([
             Spot.find({
                 isApproved: true,
                 $or: [
@@ -40,9 +37,20 @@ export const searchService = {
                     { address: regex },
                 ],
             }),
+            Experience.find({
+                isApproved: true,
+                $or: [
+                    { title: regex },
+                    { description: regex },
+                    { type: regex },
+                    { hostedBy: regex },
+                ],
+            })
+                .populate('city', 'name slug')
+                .sort({ peaceScore: -1 })
+                .limit(5),
         ]);
 
-        // Search cities
         const cities = await City.find({
             isActive: true,
             $or: [{ name: regex }, { state: regex }],
@@ -50,6 +58,7 @@ export const searchService = {
 
         return {
             spots,
+            experiences,
             cities,
             pagination: {
                 page,

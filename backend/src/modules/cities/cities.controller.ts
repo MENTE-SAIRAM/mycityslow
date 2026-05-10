@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// Cities: Controller
-// ─────────────────────────────────────────────────────────────
 import { Request, Response, NextFunction } from 'express';
 import { citiesService } from './cities.service';
 
@@ -18,6 +15,15 @@ export const citiesController = {
         try {
             const city = await citiesService.getCityBySlug(req.params.citySlug);
             res.json(city);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async getSlowGuide(req: Request, res: Response, next: NextFunction) {
+        try {
+            const guide = await citiesService.getSlowGuide(req.params.citySlug);
+            res.json(guide);
         } catch (error) {
             next(error);
         }

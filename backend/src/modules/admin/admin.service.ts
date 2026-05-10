@@ -7,6 +7,9 @@ import { City, ICity } from '../../models/City';
 import { Spot } from '../../models/Spot';
 import { SpotSubmission } from '../../models/SpotSubmission';
 import { GlobalSettings } from '../../models/GlobalSettings';
+import { Experience } from '../../models/Experience';
+import { LocalStory } from '../../models/LocalStory';
+import { CuratedGuide } from '../../models/CuratedGuide';
 import { createError } from '../../middleware/errorHandler';
 
 export const adminService = {
@@ -230,6 +233,111 @@ export const adminService = {
             });
         }
         return settings;
+    },
+
+    // ─── Experiences ─────────────────────────────────────────
+    async getAllExperiences(page: number = 1, limit: number = 20, filters: any = {}) {
+        const skip = (page - 1) * limit;
+        const query: any = {};
+        if (filters.isVerified !== undefined) query.isVerified = filters.isVerified;
+        if (filters.city) query.city = filters.city;
+
+        const [experiences, total] = await Promise.all([
+            Experience.find(query)
+                .populate('city', 'name slug')
+                .populate('submittedBy', 'name email')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            Experience.countDocuments(query),
+        ]);
+        return { experiences, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+    },
+
+    async createExperience(data: any) {
+        return Experience.create(data);
+    },
+
+    async updateExperience(id: string, data: any) {
+        if (!mongoose.Types.ObjectId.isValid(id)) throw createError(400, 'Invalid experience ID');
+        const exp = await Experience.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+        if (!exp) throw createError(404, 'Experience not found');
+        return exp;
+    },
+
+    async deleteExperience(id: string) {
+        if (!mongoose.Types.ObjectId.isValid(id)) throw createError(400, 'Invalid experience ID');
+        const exp = await Experience.findByIdAndDelete(id);
+        if (!exp) throw createError(404, 'Experience not found');
+        return { message: 'Experience deleted' };
+    },
+
+    async approveExperience(id: string) {
+        return this.updateExperience(id, { isVerified: true });
+    },
+
+    async rejectExperience(id: string) {
+        return this.updateExperience(id, { isVerified: false });
+    },
+
+    // ─── Stories ─────────────────────────────────────────────
+    async getAllStories(page: number = 1, limit: number = 20, status?: string) {
+        const skip = (page - 1) * limit;
+        const query: any = {};
+        if (status === 'approved') query.isApproved = true;
+        else if (status === 'pending') query.isApproved = false;
+
+        const [stories, total] = await Promise.all([
+            LocalStory.find(query)
+                .populate('author', 'name email')
+                .populate('city', 'name slug')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            LocalStory.countDocuments(query),
+        ]);
+        return { stories, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+    },
+
+    async approveStory(id: string) {
+        if (!mongoose.Types.ObjectId.isValid(id)) throw createError(400, 'Invalid story ID');
+        const story = await LocalStory.findByIdAndUpdate(id, { isApproved: true }, { new: true });
+        if (!story) throw createError(404, 'Story not found');
+        return story;
+    },
+
+    async rejectStory(id: string) {
+        if (!mongoose.Types.ObjectId.isValid(id)) throw createError(400, 'Invalid story ID');
+        const story = await LocalStory.findByIdAndUpdate(id, { isApproved: false }, { new: true });
+        if (!story) throw createError(404, 'Story not found');
+        return story;
+    },
+
+    // ─── Curated Guides ──────────────────────────────────────
+    async getAllGuides() {
+        const guides = await CuratedGuide.find()
+            .populate('city', 'name slug')
+            .sort({ createdAt: -1 });
+        return { guides };
+    },
+
+    async createGuide(data: any) {
+        const slug = data.slug || data.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return CuratedGuide.create({ ...data, slug });
+    },
+
+    async updateGuide(id: string, data: any) {
+        if (!mongoose.Types.ObjectId.isValid(id)) throw createError(400, 'Invalid guide ID');
+        const guide = await CuratedGuide.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+        if (!guide) throw createError(404, 'Guide not found');
+        return guide;
+    },
+
+    async deleteGuide(id: string) {
+        if (!mongoose.Types.ObjectId.isValid(id)) throw createError(400, 'Invalid guide ID');
+        const guide = await CuratedGuide.findByIdAndDelete(id);
+        if (!guide) throw createError(404, 'Guide not found');
+        return { message: 'Guide deleted' };
     },
 
     async updateGlobalSettings(userId: string, data: any) {

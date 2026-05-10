@@ -326,6 +326,30 @@ export default function Discover() {
                 )}
             </AnimatePresence>
 
+            {/* Vibe Filter Chips */}
+            <div className="flex flex-wrap gap-2 mb-8">
+                {['', 'calm', 'moderate', 'lively'].map(v => (
+                    <button
+                        key={v}
+                        onClick={() => {
+                            setVibe(v);
+                            setDraftVibe(v);
+                            const newParams = new URLSearchParams(searchParams);
+                            if (v) newParams.set('vibe', v);
+                            else newParams.delete('vibe');
+                            setSearchParams(newParams);
+                        }}
+                        className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
+                            vibe === v
+                                ? 'bg-sage text-dark-bg'
+                                : 'bg-dark-card text-white/60 hover:text-white border border-white/10'
+                        }`}
+                    >
+                        {v ? `🌿 ${v.charAt(0).toUpperCase() + v.slice(1)}` : '✨ All Vibes'}
+                    </button>
+                ))}
+            </div>
+
             <AnimatePresence>
                 {showFilters && (
                     <motion.div

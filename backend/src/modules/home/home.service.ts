@@ -3,6 +3,8 @@
 // ─────────────────────────────────────────────────────────────
 import { Spot } from '../../models/Spot';
 import { City } from '../../models/City';
+import { Experience } from '../../models/Experience';
+import { CuratedGuide } from '../../models/CuratedGuide';
 import { GlobalSettings } from '../../models/GlobalSettings';
 
 // App categories for the home screen
@@ -15,6 +17,7 @@ const CATEGORIES = [
     { id: 'lakes', name: 'Lakes & Rivers', icon: '🏞️', color: '#2196F3' },
     { id: 'viewpoints', name: 'Viewpoints', icon: '🏔️', color: '#607D8B' },
     { id: 'libraries', name: 'Libraries', icon: '📚', color: '#9C27B0' },
+    { id: 'authentic-experiences', name: 'Authentic Experiences', icon: '🎭', color: '#E91E63' },
 ];
 
 export const homeService = {
@@ -22,7 +25,6 @@ export const homeService = {
      * Get personalized home data
      */
     async getHomeData(userCity?: string) {
-        // Greeting based on time of day
         const hour = new Date().getHours();
         let greeting = 'Good morning';
         if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
@@ -62,6 +64,29 @@ export const homeService = {
             { $unwind: { path: '$city', preserveNullAndEmptyArrays: true } },
         ]);
 
+        // Authentic Experiences
+        const authenticExperiences = await Experience.find({ isApproved: true })
+            .populate('city', 'name slug')
+            .sort({ peaceScore: -1 })
+            .limit(6);
+
+        // Curated Guides
+        const guides = await CuratedGuide.find({ isPublished: true })
+            .populate('city', 'name slug image')
+            .sort({ createdAt: -1 })
+            .limit(4);
+
+        // Traveler type highlights
+        const travelerTypes = [
+            { id: 'slow-traveler', name: 'Slow Traveler', description: 'Take time to immerse, never rush' },
+            { id: 'cultural-explorer', name: 'Cultural Explorer', description: 'Seek traditions, rituals, and local life' },
+            { id: 'foodie', name: 'Foodie', description: 'Travel for taste, crave authentic flavors' },
+            { id: 'photographer', name: 'Photographer', description: 'Frame stories through the lens' },
+            { id: 'wellness-seeker', name: 'Wellness Seeker', description: 'Find peace through yoga, meditation, nature' },
+            { id: 'solo-female', name: 'Solo Female', description: 'Travel independently, value safety & community' },
+            { id: 'history-lover', name: 'History Lover', description: 'Chase stories etched in stone and time' },
+        ];
+
         // Get all active cities for the dropdown
         const cities = await City.find({ isActive: true }).select('name slug _id').sort({ name: 1 });
 
@@ -96,6 +121,9 @@ export const homeService = {
                 cityInfo,
                 trending,
                 recommended,
+                authenticExperiences,
+                guides,
+                travelerTypes,
                 categories: CATEGORIES,
             };
         }
@@ -109,6 +137,9 @@ export const homeService = {
             cityInfo,
             trending,
             recommended,
+            authenticExperiences,
+            guides,
+            travelerTypes,
             categories: CATEGORIES,
         };
     },

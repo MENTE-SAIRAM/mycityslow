@@ -16,6 +16,7 @@ export const discoveryController = {
                 bestTime: req.query.bestTime as string,
                 crowdLevel: req.query.crowdLevel as string,
                 activity: req.query.activity as string,
+                travelerType: req.query.travelerType as string,
                 lat: req.query.lat ? parseFloat(req.query.lat as string) : undefined,
                 lng: req.query.lng ? parseFloat(req.query.lng as string) : undefined,
                 radius: req.query.radius ? parseFloat(req.query.radius as string) : undefined,

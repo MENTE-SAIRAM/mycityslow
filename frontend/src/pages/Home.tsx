@@ -17,7 +17,10 @@ import {
     ChevronRight,
     Mountain,
     Library,
-    Footprints
+    Footprints,
+    BookOpen,
+    Clock,
+    Star
 } from 'lucide-react';
 import api from '../api/axios';
 import SpotCard, { type SpotData } from '../components/ui/SpotCard';
@@ -241,6 +244,25 @@ export default function Home() {
                         </div>
                     </motion.div>
 
+                    {/* Authentic Experiences CTA */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6, duration: 0.7 }}
+                        className="flex flex-wrap items-center justify-center gap-3 mt-6"
+                    >
+                        <Link to="/experiences" className="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 backdrop-blur-md border border-amber-400/30 rounded-full text-amber-300 text-sm font-bold transition-all flex items-center gap-2 group">
+                            <Sparkles className="w-4 h-4" />
+                            Discover Authentic Local Experiences
+                            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                        <Link to="/stories" className="px-5 py-3 bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white/80 text-sm font-bold transition-all flex items-center gap-2 group">
+                            <BookOpen className="w-4 h-4" />
+                            Local Stories
+                            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                    </motion.div>
+
                     {/* Floating Add Button */}
                     <motion.button
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -251,6 +273,43 @@ export default function Home() {
                     >
                         <Plus className="w-8 h-8" />
                     </motion.button>
+                </div>
+            </section>
+
+            {/* Greeting + Traveler Type Pills */}
+            <section className="py-12 px-4 max-w-7xl mx-auto w-full">
+                <div className="flex flex-col md:flex-row items-start justify-between mb-8">
+                    <div>
+                        <h2 className="text-3xl font-extrabold text-white">
+                            {(() => {
+                                const h = new Date().getHours();
+                                if (h < 12) return '☀️ Good Morning';
+                                if (h < 17) return '🌤️ Good Afternoon';
+                                return '🌅 Good Evening';
+                            })()}
+                        </h2>
+                        <p className="text-sage-light font-medium mt-1">
+                            {savedLocation?.city ? `Exploring ${savedLocation.city}` : 'Discover your next peaceful spot'}
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleLocationClick}
+                        className="mt-3 md:mt-0 px-5 py-2.5 bg-terra/10 hover:bg-terra/20 border border-terra/30 rounded-full text-sm font-bold text-terra transition-all flex items-center gap-2"
+                    >
+                        <Navigation className="w-4 h-4" />
+                        Use My Location
+                    </button>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                    {['🐢 Slow Travel', '📷 Photography', '🧘 Wellness', '🍜 Foodie', '🎭 Culture', '🏔️ Adventure', '🧳 Solo Travel', '💻 Digital Nomad'].map(type => (
+                        <Link
+                            key={type}
+                            to={`/discover?travelerType=${type.split(' ').slice(1).join('-').toLowerCase()}`}
+                            className="px-5 py-2.5 bg-dark-card hover:bg-sage/20 border border-white/10 hover:border-sage/40 rounded-full text-sm font-bold text-white/70 hover:text-white transition-all"
+                        >
+                            {type}
+                        </Link>
+                    ))}
                 </div>
             </section>
 
@@ -280,6 +339,151 @@ export default function Home() {
                     )}
                 </div>
             </section>
+
+            {/* Authentic Experiences Section */}
+            {data?.authenticExperiences?.length > 0 && (
+                <section className="py-24 px-4 max-w-7xl mx-auto w-full">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+                        <div>
+                            <span className="text-sm font-bold uppercase tracking-[0.2em] text-amber-400 mb-3 block">Go Beyond Tourism</span>
+                            <h2 className="text-4xl font-extrabold tracking-tight text-white">Authentic Local Experiences</h2>
+                            <p className="text-lg text-sage-light font-medium mt-2">Home-cooked meals, heritage walks, craft workshops — experience the real India.</p>
+                        </div>
+                        <Link to="/experiences" className="group flex items-center gap-2 text-lg font-bold text-amber-400 hover:text-white transition-colors border-b-2 border-amber-400/20 hover:border-white pb-1 whitespace-nowrap">
+                            All Experiences <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {data?.authenticExperiences?.slice(0, 3).map((exp: any) => {
+                            const defaultImg = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2940&auto=format&fit=crop';
+                            const img = exp.images?.[0] || defaultImg;
+                            const typeLabels: Record<string, string> = {
+                                'home-cooked-meal': 'Home-Cooked Meal', 'heritage-walk': 'Heritage Walk',
+                                'craft-workshop': 'Craft Workshop', 'village-visit': 'Village Visit',
+                                'cultural-session': 'Cultural Session', 'slow-travel-itinerary': 'Slow Travel',
+                                'neighborhood-exploration': 'Neighborhood Walk',
+                            };
+                            return (
+                                <Link key={exp._id} to={`/experience/${exp._id}`} className="block group">
+                                    <div className="bg-dark-card rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-amber-400/30 transition-all h-full">
+                                        <div className="relative aspect-[4/3] overflow-hidden">
+                                            <img src={img} alt={exp.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                                            <div className="absolute top-4 left-4">
+                                                <span className="px-3 py-1.5 bg-amber-500/20 backdrop-blur-md rounded-full text-xs font-black text-amber-300 uppercase tracking-wider border border-amber-400/30">
+                                                    {typeLabels[exp.type] || exp.type}
+                                                </span>
+                                            </div>
+                                            <div className="absolute bottom-4 right-4 flex items-center gap-1.5 text-white text-sm font-bold">
+                                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                                {exp.peaceScore}
+                                            </div>
+                                        </div>
+                                        <div className="p-6">
+                                            <h3 className="text-lg font-extrabold text-white mb-2 group-hover:text-amber-400 transition-colors leading-tight">{exp.title}</h3>
+                                            <div className="flex items-center gap-3 text-sm text-sage-light font-bold">
+                                                <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{exp.duration}</span>
+                                                <span>{exp.city?.name}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </section>
+            )}
+
+            {/* First Time Guide Card */}
+            {savedLocation?.city && (
+                <section className="py-12 px-4 max-w-7xl mx-auto w-full">
+                    <div className="relative rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-sage/20 to-dark-card border border-white/10 p-8 md:p-12">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex-1">
+                                <span className="text-xs font-black uppercase tracking-[0.2em] text-sage mb-3 block">First Time?</span>
+                                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
+                                    First Time in {savedLocation.city}?
+                                </h2>
+                                <p className="text-sage-light font-medium text-lg mb-6">
+                                    Our curated 3-day slow travel guide — designed by locals for the mindful traveler.
+                                </p>
+                                <Link
+                                    to="/guides"
+                                    className="inline-flex items-center gap-2 px-8 py-4 bg-sage text-dark-bg rounded-full font-bold hover:bg-white transition-all shadow-xl"
+                                >
+                                    View Guide
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
+                            </div>
+                            <div className="text-6xl md:text-8xl opacity-80">🗺️</div>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* Curated Guides Section */}
+            {data?.guides?.length > 0 && (
+                <section className="py-24 px-4 bg-white/5 max-w-7xl mx-auto w-full rounded-[4rem]">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 px-4">
+                        <div>
+                            <span className="text-sm font-bold uppercase tracking-[0.2em] text-purple-400 mb-3 block">First Time?</span>
+                            <h2 className="text-4xl font-extrabold tracking-tight text-white">Curated City Guides</h2>
+                            <p className="text-lg text-sage-light font-medium mt-2">Handpicked itineraries for first-time visitors, designed by locals.</p>
+                        </div>
+                        <Link to="/guides" className="group flex items-center gap-2 text-lg font-bold text-purple-400 hover:text-white transition-colors border-b-2 border-purple-400/20 hover:border-white pb-1 whitespace-nowrap">
+                            All Guides <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+                        {data?.guides?.slice(0, 4).map((guide: any) => {
+                            const defaultGuideImg = 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=3000&auto=format&fit=crop';
+                            const gImg = guide.image || guide.city?.image || defaultGuideImg;
+                            return (
+                                <Link key={guide._id} to={`/guides/${guide.city?.slug}`} className="block group">
+                                    <div className="bg-dark-card rounded-[2rem] overflow-hidden border border-white/5 hover:border-purple-400/30 transition-all">
+                                        <div className="relative h-40 overflow-hidden">
+                                            <img src={gImg} alt={guide.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                                            <div className="absolute bottom-3 left-4">
+                                                <h3 className="text-lg font-extrabold text-white">{guide.city?.name}</h3>
+                                            </div>
+                                        </div>
+                                        <div className="p-5">
+                                            <p className="text-sm text-sage-light font-bold line-clamp-2">{guide.title}</p>
+                                            <div className="flex items-center gap-2 mt-3 text-xs text-white/60 font-bold">
+                                                <Clock className="w-3 h-3" />
+                                                <span>{guide.duration}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </section>
+            )}
+
+            {/* Traveler Type Section */}
+            {data?.travelerTypes?.length > 0 && (
+                <section className="py-24 px-4 max-w-7xl mx-auto w-full">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl font-extrabold tracking-tight mb-4 text-white">What Kind of Traveler Are You?</h2>
+                        <p className="text-lg text-sage-light font-medium">Find experiences curated for your travel style.</p>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                        {data?.travelerTypes?.map((t: any) => (
+                            <Link
+                                key={t.id}
+                                to={`/experiences?travelerType=${t.id}`}
+                                className="bg-dark-card p-6 rounded-2xl hover:shadow-premium-hover transition-all group flex flex-col items-center justify-center gap-3 border border-white/5 hover:border-sage/30 text-center"
+                            >
+                                <span className="text-base font-extrabold text-white group-hover:text-sage transition-colors">{t.name}</span>
+                                <span className="text-xs text-sage-light font-medium leading-tight">{t.description}</span>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Vibe Section */}
             <section className="py-24 px-4 bg-white/5">

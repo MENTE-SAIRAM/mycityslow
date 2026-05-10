@@ -5,12 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowLeft, MapPin, Heart, Clock, Navigation, Star, Send,
     ChevronLeft, ChevronRight, X, MessageCircle, User,
-    Bus, Info, Maximize2
+    Bus, Info, Maximize2, BookOpen
 } from 'lucide-react';
 import api from '../api/axios';
 import { useAppStore } from '../store/useAppStore';
 import { Helmet } from 'react-helmet-async';
 import { resolveImageUrl } from '../utils/image';
+import { Link } from 'react-router-dom';
 
 interface Review {
     _id: string;
@@ -46,6 +47,12 @@ export default function SpotDetail() {
         queryKey: ['collection'],
         queryFn: () => api.get('/collection').then(res => res.data.data.spots),
         enabled: !!user,
+    });
+
+    const { data: storiesData } = useQuery({
+        queryKey: ['spot-stories', id],
+        queryFn: () => api.get(`/stories/spot/${id}`).then(res => res.data.data),
+        enabled: !!id,
     });
 
     const addReviewMutation = useMutation({
@@ -323,7 +330,48 @@ export default function SpotDetail() {
                             </section>
                         )}
 
-                        {/* Reviews */}
+                        {/* Local Stories */}
+                        {storiesData?.stories?.length > 0 && (
+                            <section className="pt-10 border-t border-white/5">
+                                <h2 className="text-3xl font-extrabold mb-8 flex items-center gap-3">
+                                    <BookOpen className="w-8 h-8 text-amber-400" />
+                                    Local Stories
+                                </h2>
+                                <div className="space-y-6">
+                                    {storiesData.stories.slice(0, 3).map((story: any) => (
+                                        <div key={story._id} className="p-8 bg-dark-card rounded-[2.5rem] border border-white/5">
+                                            <div className="flex items-start gap-4 mb-4">
+                                                <div className="w-12 h-12 rounded-2xl bg-sage/20 flex items-center justify-center flex-shrink-0">
+                                                    <User className="w-6 h-6 text-sage" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-xl text-white">{story.title}</h4>
+                                                    <p className="text-xs text-sage-light font-bold mt-1">
+                                                        {story.author?.name || story.authorName} · {new Date(story.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <p className="text-sage-light font-medium leading-relaxed">
+                                                {story.content.substring(0, 250)}{story.content.length > 250 ? '...' : ''}
+                                            </p>
+                                            {story.tags?.length > 0 && (
+                                                <div className="flex flex-wrap gap-2 mt-4">
+                                                    {story.tags.map((tag: string) => (
+                                                        <span key={tag} className="px-3 py-1 bg-white/5 text-white/60 font-bold rounded-full text-xs">#{tag}</span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                <Link to={`/stories`} className="inline-flex items-center gap-2 mt-6 text-amber-400 font-bold hover:text-white transition-colors">
+                                    <BookOpen className="w-4 h-4" />
+                                    Read more local stories <ArrowLeft className="w-4 h-4 rotate-180" />
+                                </Link>
+                            </section>
+                        )}
+
+            {/* Reviews */}
                         <section className="pt-10 border-t border-white/5">
                             <div className="flex items-center justify-between mb-12">
                                 <h2 className="text-3xl font-extrabold flex items-center gap-4">
@@ -442,6 +490,18 @@ export default function SpotDetail() {
                                         <span className="text-sage-light font-medium">Vibe</span>
                                         <span className="text-white font-bold capitalize">{spot.vibe.replace('-', ' ')}</span>
                                     </div>
+                                    {spot.travelerTypes?.length > 0 && (
+                                        <div className="pt-4 border-t border-white/5">
+                                            <span className="text-sage-light font-medium block mb-3">Perfect for</span>
+                                            <div className="flex flex-wrap gap-2">
+                                                {spot.travelerTypes.map((t: string) => (
+                                                    <span key={t} className="px-3 py-1.5 bg-sage/10 text-sage font-bold rounded-full text-xs capitalize">
+                                                        {t.replace(/-/g, ' ')}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </section>

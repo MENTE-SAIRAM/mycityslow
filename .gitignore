@@ -4,3 +4,13 @@ dist/
 uploads/
 .DS_Store
 *.log
+
+# Android
+frontend-android/.gradle/
+frontend-android/app/build/
+frontend-android/build/
+frontend-android/local.properties
+frontend-android/.idea/
+frontend-android/*.iml
+frontend-android/captures/
+

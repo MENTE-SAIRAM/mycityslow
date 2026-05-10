@@ -14,9 +14,10 @@ interface DiscoveryQuery {
     bestTime?: string;
     crowdLevel?: string;
     activity?: string;
+    travelerType?: string;
     lat?: number;
     lng?: number;
-    radius?: number; // in km
+    radius?: number;
     search?: string;
     page?: number;
     limit?: number;
@@ -52,6 +53,10 @@ export const spotsService = {
         // Activity filter
         if (query.activity) {
             filter.activities = { $in: [query.activity] };
+        }
+
+        if (query.travelerType) {
+            filter.travelerTypes = { $in: [query.travelerType] };
         }
 
         // Text search
@@ -274,7 +279,8 @@ export const spotsService = {
             { id: 'library', name: 'Libraries' },
             { id: 'temple', name: 'Spiritual' },
             { id: 'nature', name: 'Nature' },
-            { id: 'viewpoint', name: 'Viewpoints' }
+            { id: 'viewpoint', name: 'Viewpoints' },
+            { id: 'authentic-experiences', name: 'Authentic Experiences' }
         ];
 
         const vibes = [
@@ -283,6 +289,16 @@ export const spotsService = {
             { id: 'energetic', name: 'Energetic' }
         ];
 
-        return { cities, categories, vibes };
+        const travelerTypes = [
+            { id: 'slow-traveler', name: 'Slow Traveler' },
+            { id: 'cultural-explorer', name: 'Cultural Explorer' },
+            { id: 'foodie', name: 'Foodie' },
+            { id: 'photographer', name: 'Photographer' },
+            { id: 'wellness-seeker', name: 'Wellness Seeker' },
+            { id: 'solo-female', name: 'Solo Female' },
+            { id: 'history-lover', name: 'History Lover' },
+        ];
+
+        return { cities, categories, vibes, travelerTypes };
     }
 };

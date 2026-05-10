@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.MyCitySlow" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.MyCitySlow.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#0F1A17</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.MyCitySlow</item>
+    </style>
+</resources>

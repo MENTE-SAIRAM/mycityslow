@@ -23,6 +23,11 @@ import Privacy from './pages/Privacy';
 import Journal from './pages/Journal';
 import Help from './pages/Help';
 import Map from './pages/Map';
+import Experiences from './pages/Experiences';
+import ExperienceDetail from './pages/ExperienceDetail';
+import Guides from './pages/Guides';
+import GuideDetail from './pages/GuideDetail';
+import Stories from './pages/Stories';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,6 +96,11 @@ function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/help" element={<Help />} />
+            <Route path="/experiences" element={<Experiences />} />
+            <Route path="/experience/:id" element={<ExperienceDetail />} />
+            <Route path="/guides" element={<Guides />} />
+            <Route path="/guides/:citySlug" element={<GuideDetail />} />
+            <Route path="/stories" element={<Stories />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
