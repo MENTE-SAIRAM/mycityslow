@@ -34,7 +34,7 @@ fun HomeScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    if (state.error != null && state.trendingSpots.isEmpty() && !state.isLoading) {
+    if (state.error != null && state.cards.isEmpty() && !state.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -66,7 +66,6 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
-        // Greeting header
         item {
             Column(
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
@@ -86,145 +85,283 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = state.currentCity?.name ?: "Select a city",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = SageGreen,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = Terracotta.copy(alpha = 0.15f),
-                        ) {
-                            Text(
-                                text = "📍 Use My Location",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Terracotta,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                            )
-                        }
-                    }
+                    Text(
+                        text = "Discover peaceful spots in your city",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
         }
 
-        // Traveler Types
-        item {
-            if (state.travelerTypes.isNotEmpty()) {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(state.travelerTypes) { type ->
-                        Surface(
-                            shape = RoundedCornerShape(20.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                        ) {
-                            Text(
-                                text = type,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-        }
-
-        // Trending Peaceful Spots
-        item {
-            SectionHeader(title = "🌿 Trending Peaceful Spots")
-        }
-        if (state.isLoading) {
+        if (state.isLoading && state.cards.isEmpty()) {
             item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    items(3) {
-                        Box(
-                            modifier = Modifier
-                                .width(260.dp)
-                                .height(220.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(Color.Gray.copy(alpha = 0.3f))
-                        )
-                    }
+                    CircularProgressIndicator(color = SageGreen)
                 }
             }
         } else {
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(state.trendingSpots) { spot ->
-                        SpotCard(
-                            spot = spot,
-                            onClick = {
-                                if (spot.slug.isNotBlank()) {
-                                    onSpotClick(spot.id)
+            val cards = state.cards
+            cards.forEachIndexed { index, card ->
+                when (card.type) {
+                    "traveler_types" -> {
+                        item(key = "traveler_types_$index") {
+                            val types = extractList(card.data, "types")
+                            if (types.isNotEmpty()) {
+                                LazyRow(
+                                    contentPadding = PaddingValues(horizontal = 24.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    items(types) { type ->
+                                        Surface(
+                                            shape = RoundedCornerShape(20.dp),
+                                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                        ) {
+                                            Text(
+                                                text = type,
+                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                                style = MaterialTheme.typography.labelLarge,
+                                                color = MaterialTheme.colorScheme.primary,
+                                            )
+                                        }
+                                    }
                                 }
-                            },
-                            modifier = Modifier.width(280.dp),
-                        )
+                                Spacer(modifier = Modifier.height(12.dp))
+                            }
+                        }
+                    }
+                    "trending_spots" -> {
+                        item(key = "trending_$index") {
+                            SectionHeader(title = "🌿 Trending Peaceful Spots")
+                        }
+                        item(key = "trending_content_$index") {
+                            val spots = extractSpotList(card.data, "spots")
+                            if (spots.isNotEmpty()) {
+                                LazyRow(
+                                    contentPadding = PaddingValues(horizontal = 24.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                ) {
+                                    items(spots) { spot ->
+                                        SpotCard(
+                                            spot = spot,
+                                            onClick = {
+                                                if (spot.id.isNotBlank()) {
+                                                    onSpotClick(spot.id)
+                                                }
+                                            },
+                                            modifier = Modifier.width(280.dp),
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
+                    }
+                    "authentic_experiences" -> {
+                        item(key = "experiences_$index") {
+                            SectionHeader(title = "🏡 Authentic Experiences")
+                        }
+                        item(key = "experiences_content_$index") {
+                            val exps = extractExperienceList(card.data, "experiences")
+                            if (exps.isNotEmpty()) {
+                                LazyRow(
+                                    contentPadding = PaddingValues(horizontal = 24.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                ) {
+                                    items(exps) { exp ->
+                                        ExperienceCard(experience = exp, onClick = { })
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
+                    }
+                    "first_time_guide" -> {
+                        item(key = "guide_$index") {
+                            val cityName = extractString(card.data, "cityName")
+                            if (cityName != null) {
+                                FirstTimeGuideCard(cityName = cityName)
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                        }
+                    }
+                    "categories" -> {
+                        item(key = "categories_$index") {
+                            SectionHeader(title = "Explore by Category")
+                        }
+                        item(key = "categories_content_$index") {
+                            val categories = extractCategoryList(card.data, "categories")
+                            if (categories.isNotEmpty()) {
+                                LazyRow(
+                                    contentPadding = PaddingValues(horizontal = 24.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                ) {
+                                    items(categories) { cat ->
+                                        CategoryChip(cat)
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.height(24.dp))
             }
         }
 
-        // Authentic Experiences
-        item {
-            SectionHeader(title = "🏡 Authentic Experiences")
-        }
-        if (state.isLoading) {
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(3) {
-                        Box(
-                            modifier = Modifier
-                                .width(260.dp)
-                                .height(160.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(Color.Gray.copy(alpha = 0.3f))
-                        )
-                    }
-                }
-            }
-        } else {
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(state.authenticExperiences) { exp ->
-                        ExperienceCard(
-                            experience = exp,
-                            onClick = { /* navigate to experience detail */ }
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-        }
-
-        // First Time Guide
-        item {
-            if (state.currentCity != null) {
-                FirstTimeGuideCard(cityName = state.currentCity!!.name)
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-
-        // Bottom padding
         item { Spacer(modifier = Modifier.height(16.dp)) }
+    }
+}
+
+private fun extractString(data: Map<String, Any>?, key: String): String? {
+    return (data?.get(key) as? String)
+}
+
+private fun extractList(data: Map<String, Any>?, key: String): List<String> {
+    return when (val raw = data?.get(key)) {
+        is List<*> -> raw.mapNotNull { item ->
+            when (item) {
+                is String -> item
+                // API returns objects {id, name, description} - extract "name"
+                is Map<*, *> -> item["name"]?.toString()
+                else -> null
+            }
+        }
+        else -> emptyList()
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun extractSpotList(data: Map<String, Any>?, key: String): List<com.mycityslow.app.domain.model.Spot> {
+    val rawList = data?.get(key) as? List<*> ?: return emptyList()
+    return rawList.mapNotNull { it as? Map<*, *> }.map { map ->
+        val locMap = map["location"] as? Map<*, *>
+        val coords = locMap?.get("coordinates") as? List<*>
+        com.mycityslow.app.domain.model.Spot(
+            id = map["_id"]?.toString() ?: map["id"]?.toString() ?: "",
+            // API uses "title"; fall back to "name" for backward compat
+            name = map["title"]?.toString() ?: map["name"]?.toString() ?: "",
+            slug = map["slug"]?.toString() ?: "",
+            description = map["description"]?.toString() ?: "",
+            longDescription = map["longDescription"]?.toString() ?: "",
+            images = (map["images"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+            city = (map["city"] as? Map<*, *>)?.let {
+                com.mycityslow.app.domain.model.City(
+                    id = it["_id"]?.toString() ?: "",
+                    name = it["name"]?.toString() ?: "",
+                    slug = it["slug"]?.toString() ?: "",
+                    state = it["state"]?.toString() ?: "",
+                    description = "", image = "", spotCount = 0, peacefulScore = 0.0,
+                    tags = emptyList(), knownFor = emptyList(),
+                    bestTimeToVisit = "", howToReach = "", localTips = "",
+                )
+            } ?: com.mycityslow.app.domain.model.City(
+                "", "", "", "", "", "", 0, 0.0, emptyList(), emptyList(), "", "", "",
+            ),
+            // API uses "categories" array; fall back to "category" string
+            category = (map["categories"] as? List<*>)?.filterIsInstance<String>()?.firstOrNull()
+                ?: map["category"]?.toString() ?: "",
+            peaceScore = (map["peaceScore"] as? Number)?.toDouble() ?: 0.0,
+            vibe = map["vibe"]?.toString() ?: "",
+            bestTime = map["bestTime"]?.toString() ?: "",
+            crowdLevel = map["crowdLevel"]?.toString() ?: "",
+            entryFee = map["entryFee"]?.toString() ?: "Free",
+            timings = map["timings"]?.toString() ?: map["openingHours"]?.toString() ?: "",
+            location = com.mycityslow.app.domain.model.SpotLocation(
+                // GeoJSON: coordinates = [longitude, latitude] (index 0 = lng, 1 = lat)
+                lat = (locMap?.get("lat") as? Number)?.toDouble()
+                    ?: (coords?.getOrNull(1) as? Number)?.toDouble() ?: 0.0,
+                lng = (locMap?.get("lng") as? Number)?.toDouble()
+                    ?: (coords?.getOrNull(0) as? Number)?.toDouble() ?: 0.0,
+                // "address" is top-level in the API
+                address = map["address"]?.toString() ?: locMap?.get("address")?.toString() ?: "",
+            ),
+            tags = (map["tags"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+            isSaved = false,
+            travelerTypes = (map["travelerTypes"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+            isTouristFriendly = (map["isTouristFriendly"] as? Boolean) ?: true,
+            localStory = map["localStory"]?.toString()?.ifBlank { null },
+            bestForTravelers = (map["bestForTravelers"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+        )
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun extractExperienceList(data: Map<String, Any>?, key: String): List<com.mycityslow.app.domain.model.Experience> {
+    val rawList = data?.get(key) as? List<*> ?: return emptyList()
+    return rawList.mapNotNull { it as? Map<*, *> }.map { map ->
+        com.mycityslow.app.domain.model.Experience(
+            id = map["_id"]?.toString() ?: map["id"]?.toString() ?: "",
+            name = map["title"]?.toString() ?: map["name"]?.toString() ?: "",
+            description = map["description"]?.toString() ?: "",
+            images = (map["images"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+            city = com.mycityslow.app.domain.model.City(
+                id = "", name = "", slug = "", state = "",
+                description = "", image = "", spotCount = 0, peacefulScore = 0.0,
+                tags = emptyList(), knownFor = emptyList(),
+                bestTimeToVisit = "", howToReach = "", localTips = "",
+            ),
+            type = map["type"]?.toString() ?: "",
+            category = (map["categories"] as? List<*>)?.filterIsInstance<String>()?.firstOrNull()
+                ?: map["category"]?.toString() ?: "",
+            priceRange = map["priceRange"]?.toString() ?: "",
+            duration = map["duration"]?.toString() ?: "",
+            languages = (map["languages"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+            rating = (map["rating"] as? Number)?.toDouble() ?: 0.0,
+            hostName = map["hostName"]?.toString() ?: "",
+            hostContact = map["hostContact"]?.toString() ?: "",
+            isVerified = (map["isVerified"] as? Boolean) ?: false,
+            tags = (map["tags"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+            vibe = map["vibe"]?.toString() ?: "",
+            timing = map["timing"]?.toString() ?: map["bestTime"]?.toString() ?: "",
+            travelerTypes = (map["travelerTypes"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+        )
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+private data class CategoryItem(
+    val id: String,
+    val name: String,
+    val icon: String,
+    val color: String,
+)
+
+@Suppress("UNCHECKED_CAST")
+private fun extractCategoryList(data: Map<String, Any>?, key: String): List<CategoryItem> {
+    val rawList = data?.get(key) as? List<Map<String, Any?>> ?: return emptyList()
+    return rawList.map { map ->
+        CategoryItem(
+            id = map["id"]?.toString() ?: "",
+            name = map["name"]?.toString() ?: "",
+            icon = map["icon"]?.toString() ?: "",
+            color = map["color"]?.toString() ?: "",
+        )
+    }
+}
+
+@Composable
+private fun CategoryChip(category: CategoryItem) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(text = category.icon, style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = category.name,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 }
 
@@ -356,5 +493,3 @@ fun FirstTimeGuideCard(cityName: String) {
         }
     }
 }
-
-

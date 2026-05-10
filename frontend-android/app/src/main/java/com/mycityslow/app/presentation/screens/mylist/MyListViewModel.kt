@@ -36,7 +36,7 @@ class MyListViewModel @Inject constructor(
                 val spots = response.data?.spots?.map { dto ->
                     Spot(
                         id = dto.id ?: dto.idAlt ?: "",
-                        name = dto.name,
+                        name = dto.name ?: "",
                         slug = dto.slug ?: "",
                         description = dto.description ?: "",
                         longDescription = dto.longDescription ?: "",

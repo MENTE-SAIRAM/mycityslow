@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,7 +51,9 @@ fun MyListScreen(
         when {
             state.isLoading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(color = SageGreen)
@@ -58,7 +61,9 @@ fun MyListScreen(
             }
             state.error != null -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(
@@ -80,7 +85,9 @@ fun MyListScreen(
             }
             state.isEmpty -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(
@@ -114,13 +121,18 @@ fun MyListScreen(
                     contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                 ) {
-                    items(state.savedSpots, key = { it.id }) { spot ->
+                    itemsIndexed(
+                        items = state.savedSpots,
+                        key = { index, spot -> "${spot.id}_$index" },
+                    ) { _, spot ->
                         SpotCard(
                             spot = spot,
                             onClick = {
-                                if (spot.slug.isNotBlank()) {
+                                if (spot.id.isNotBlank()) {
                                     onSpotClick(spot.id)
                                 }
                             },

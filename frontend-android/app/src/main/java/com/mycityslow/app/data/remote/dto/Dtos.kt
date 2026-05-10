@@ -38,9 +38,9 @@ data class PaginationDto(
 data class CityDto(
     @SerializedName("_id") val id: String?,
     @SerializedName("id") val idAlt: String?,
-    @SerializedName("name") val name: String,
-    @SerializedName("slug") val slug: String,
-    @SerializedName("state") val state: String,
+    @SerializedName("name") val name: String?,
+    @SerializedName("slug") val slug: String?,
+    @SerializedName("state") val state: String?,
     @SerializedName("description") val description: String?,
     @SerializedName("image") val image: String?,
     @SerializedName("spotCount") val spotCount: Int?,
@@ -57,20 +57,27 @@ data class CityDto2(
 )
 
 data class SpotLocationDto(
-    @SerializedName("lat") val lat: Double,
-    @SerializedName("lng") val lng: Double,
-    @SerializedName("address") val address: String,
+    @SerializedName("lat") val lat: Double?,
+    @SerializedName("lng") val lng: Double?,
+    @SerializedName("address") val address: String?,
+    // GeoJSON format: coordinates = [longitude, latitude]
+    @SerializedName("coordinates") val coordinates: List<Double>?,
+    @SerializedName("type") val type: String?,
 )
 
 data class SpotDto(
     @SerializedName("_id") val id: String?,
     @SerializedName("id") val idAlt: String?,
-    @SerializedName("name") val name: String,
+    // API returns "title" — "name" kept for backward compat
+    @SerializedName("title") val title: String?,
+    @SerializedName("name") val name: String?,
     @SerializedName("slug") val slug: String?,
     @SerializedName("description") val description: String?,
     @SerializedName("longDescription") val longDescription: String?,
     @SerializedName("images") val images: List<String>?,
     @SerializedName("city") val city: CityDto?,
+    // API returns "categories" array — "category" kept for backward compat
+    @SerializedName("categories") val categories: List<String>?,
     @SerializedName("category") val category: String?,
     @SerializedName("peaceScore") val peaceScore: Double?,
     @SerializedName("vibe") val vibe: String?,
@@ -78,7 +85,10 @@ data class SpotDto(
     @SerializedName("crowdLevel") val crowdLevel: String?,
     @SerializedName("entryFee") val entryFee: String?,
     @SerializedName("timings") val timings: String?,
+    @SerializedName("openingHours") val openingHours: String?,
     @SerializedName("location") val location: SpotLocationDto?,
+    // "address" is a top-level field in the API (not inside location)
+    @SerializedName("address") val address: String?,
     @SerializedName("tags") val tags: List<String>?,
     @SerializedName("travelerTypes") val travelerTypes: List<String>?,
     @SerializedName("isTouristFriendly") val isTouristFriendly: Boolean?,
@@ -89,12 +99,17 @@ data class SpotDto(
 data class ExperienceDto(
     @SerializedName("_id") val id: String?,
     @SerializedName("id") val idAlt: String?,
-    @SerializedName("name") val name: String,
+    // API returns "title" — "name" kept for backward compat
+    @SerializedName("title") val title: String?,
+    @SerializedName("name") val name: String?,
     @SerializedName("description") val description: String?,
     @SerializedName("images") val images: List<String>?,
     @SerializedName("city") val city: CityDto?,
     @SerializedName("type") val type: String?,
+    // API returns "categories" array — "category" kept for backward compat
+    @SerializedName("categories") val categories: List<String>?,
     @SerializedName("category") val category: String?,
+    @SerializedName("address") val address: String?,
     @SerializedName("priceRange") val priceRange: String?,
     @SerializedName("duration") val duration: String?,
     @SerializedName("languages") val languages: List<String>?,
@@ -105,6 +120,7 @@ data class ExperienceDto(
     @SerializedName("tags") val tags: List<String>?,
     @SerializedName("vibe") val vibe: String?,
     @SerializedName("timing") val timing: String?,
+    @SerializedName("bestTime") val bestTime: String?,
     @SerializedName("travelerTypes") val travelerTypes: List<String>?,
 )
 
@@ -143,7 +159,15 @@ data class CuratedGuideDto(
     @SerializedName("sections") val sections: List<GuideSectionDto>?,
 )
 
+data class HomeCardDto(
+    @SerializedName("type") val type: String,
+    @SerializedName("data") val data: Map<String, Any>?,
+)
+
 data class HomeDataDto(
+    @SerializedName("greeting") val greeting: String?,
+    @SerializedName("cards") val cards: List<HomeCardDto>?,
+    @SerializedName("cities") val cities: List<CityDto>?,
     @SerializedName("trendingSpots") val trendingSpots: List<SpotDto>?,
     @SerializedName("authenticExperiences") val authenticExperiences: List<ExperienceDto>?,
     @SerializedName("guides") val guides: List<CuratedGuideDto>?,

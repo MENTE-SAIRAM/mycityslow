@@ -83,7 +83,7 @@ fun SpotDetailScreen(
                 }
             }
             else -> {
-                val spot = state.spot!!
+                val spot = state.spot ?: return@Scaffold
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

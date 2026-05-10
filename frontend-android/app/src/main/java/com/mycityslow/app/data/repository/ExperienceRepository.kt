@@ -33,20 +33,20 @@ class ExperienceRepository @Inject constructor(
 
     private fun ExperienceDto.toDomain(): Experience = Experience(
         id = id ?: idAlt ?: "",
-        name = name,
+        name = title ?: name ?: "",
         description = description ?: "",
         images = images ?: emptyList(),
         city = city?.let {
             City(
-                id = it.id ?: it.idAlt ?: "", name = it.name, slug = it.slug,
-                state = it.state, description = it.description ?: "", image = it.image ?: "",
+                id = it.id ?: it.idAlt ?: "", name = it.name ?: "", slug = it.slug ?: "",
+                state = it.state ?: "", description = it.description ?: "", image = it.image ?: "",
                 spotCount = it.spotCount ?: 0, peacefulScore = it.peacefulScore ?: 0.0,
                 tags = it.tags ?: emptyList(), knownFor = it.knownFor ?: emptyList(),
                 bestTimeToVisit = "", howToReach = "", localTips = "",
             )
         } ?: City("", "", "", "", "", "", 0, 0.0, emptyList(), emptyList(), "", "", ""),
         type = type ?: "",
-        category = category ?: "",
+        category = categories?.firstOrNull() ?: category ?: "",
         priceRange = priceRange ?: "",
         duration = duration ?: "",
         languages = languages ?: emptyList(),
@@ -56,7 +56,7 @@ class ExperienceRepository @Inject constructor(
         isVerified = isVerified ?: false,
         tags = tags ?: emptyList(),
         vibe = vibe ?: "",
-        timing = timing ?: "",
+        timing = timing ?: bestTime ?: "",
         travelerTypes = travelerTypes ?: emptyList(),
     )
 }

@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -79,14 +79,18 @@ fun DiscoveryScreen(
         // Results grid
         if (state.isLoading && state.spots.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(color = SageGreen)
             }
         } else if (state.error != null && state.spots.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 contentAlignment = Alignment.Center,
             ) {
                 Column(
@@ -106,7 +110,9 @@ fun DiscoveryScreen(
             }
         } else if (state.spots.isEmpty()) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -130,13 +136,18 @@ fun DiscoveryScreen(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
             ) {
-                items(state.spots, key = { it.id }) { spot ->
+                itemsIndexed(
+                    items = state.spots,
+                    key = { index, spot -> "${spot.id}_$index" },
+                ) { _, spot ->
                     SpotCard(
                         spot = spot,
                         onClick = {
-                            if (spot.slug.isNotBlank()) {
+                            if (spot.id.isNotBlank()) {
                                 onSpotClick(spot.id)
                             }
                         },

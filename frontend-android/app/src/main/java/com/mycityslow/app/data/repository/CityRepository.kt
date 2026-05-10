@@ -40,10 +40,10 @@ class CityRepository @Inject constructor(
     }
 
     private fun CityDto.toEntity() = CachedCityEntity(
-        id = id ?: idAlt ?: slug,
-        name = name,
-        slug = slug,
-        state = state,
+        id = id ?: idAlt ?: slug ?: "",
+        name = name ?: "",
+        slug = slug ?: "",
+        state = state ?: "",
         description = description,
         image = image,
         spotCount = spotCount,

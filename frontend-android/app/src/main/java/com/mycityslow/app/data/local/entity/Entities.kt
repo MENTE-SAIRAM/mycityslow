@@ -74,8 +74,4 @@ data class SavedSpotEntity(
     val savedAt: Long = System.currentTimeMillis(),
 )
 
-@Entity(tableName = "saved_experiences")
-data class SavedExperienceEntity(
-    @PrimaryKey val experienceId: String,
-    val savedAt: Long = System.currentTimeMillis(),
-)
+
