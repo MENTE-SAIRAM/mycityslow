@@ -28,7 +28,7 @@ const emptyForm = {
 
 const toPreviewUrl = (url: string) => {
     if (!url) return '';
-    if (url.startsWith('/uploads/')) return `http://localhost:3000${url}`;
+    if (url.startsWith('/uploads/')) return `https://mycityslow.onrender.com${url}`;
     return url;
 };
 

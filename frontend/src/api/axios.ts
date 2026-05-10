@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000/api', // Backend base URL
+    baseURL: 'https://mycityslow.onrender.com/api',
 });
 
 // Request Interceptor: add auth token
@@ -23,7 +23,7 @@ api.interceptors.response.use(
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (refreshToken) {
-                    const res = await axios.post('http://localhost:3000/api/auth/refresh', { refreshToken });
+                    const res = await axios.post('https://mycityslow.onrender.com/api/auth/refresh', { refreshToken });
                     const newToken = res.data.data.accessToken;
                     const newRefreshToken = res.data.data.refreshToken;
                     localStorage.setItem('token', newToken);
