@@ -24,7 +24,7 @@ export const homeService = {
     /**
      * Get personalized home data
      */
-    async getHomeData(userCity?: string) {
+    async getHomeData(userCity?: string, platform?: string) {
         const hour = new Date().getHours();
         let greeting = 'Good morning';
         if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
@@ -90,34 +90,81 @@ export const homeService = {
         // Get all active cities for the dropdown
         const cities = await City.find({ isActive: true }).select('name slug _id').sort({ name: 1 });
 
+        // Build cards array for platform-aware clients (Android)
+        const cards: any[] = [
+            { type: 'greeting', data: { greeting } },
+            { type: 'city_info', data: cityInfo },
+            { type: 'traveler_types', data: { types: travelerTypes } },
+            { type: 'trending_spots', data: { spots: trending } },
+            { type: 'authentic_experiences', data: { experiences: authenticExperiences } },
+            { type: 'first_time_guide', data: cityInfo ? { cityName: cityInfo.name } : null },
+            { type: 'categories', data: { categories: CATEGORIES } },
+        ].filter(c => c.data !== null);
+
+        // If platform is android, return cards-based format
+        if (platform === 'android') {
+            return {
+                success: true,
+                message: 'Success',
+                data: {
+                    greeting,
+                    cards,
+                    cities,
+                },
+            };
+        }
+
         // Get dynamic settings
         let settings = await GlobalSettings.findOne();
         if (!settings) {
-            // Fallback to defaults if settings don't exist yet
             return {
+                success: true,
+                message: 'Success',
+                data: {
+                    greeting,
+                    cities,
+                    hero: {
+                        title: 'Find Peace in Your City',
+                        subtitle: 'Rediscover the rhythm of intentional living. Uncover hidden sanctuaries and quiet corners designed for your wellbeing.',
+                        backgroundImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=3000&auto=format&fit=crop',
+                        phoneImage: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=1000&auto=format&fit=crop'
+                    },
+                    philosophy: {
+                        title: 'Philosophy of Presence',
+                        subtitle: 'Why we advocate for a slower urban pace.',
+                        cards: [
+                            { title: 'Mental Clarity', description: 'Reducing noise and visual clutter allows your mind to rest and refocus on what truly matters in the present moment.', icon: 'sparkles' },
+                            { title: 'Heart Rate', description: 'We curate spaces with proven low-decibel environments and high vegetation to naturally lower physiological stress.', icon: 'heart' },
+                            { title: 'Urban Harmony', description: 'Fostering a deeper connection with the quiet natural elements that still exist within our bustling metropolitan homes.', icon: 'leaf' }
+                        ]
+                    },
+                    cta: {
+                        title: 'Ready to slow down?',
+                        subtitle: 'Join a community of 50,000+ urban dwellers finding their sanctuary in the city.',
+                        buttonText: 'Start Your Journey',
+                        image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop'
+                    },
+                    cityInfo,
+                    trending,
+                    recommended,
+                    authenticExperiences,
+                    guides,
+                    travelerTypes,
+                    categories: CATEGORIES,
+                    cards,
+                },
+            };
+        }
+
+        return {
+            success: true,
+            message: 'Success',
+            data: {
                 greeting,
                 cities,
-                hero: {
-                    title: 'Find Peace in Your City',
-                    subtitle: 'Rediscover the rhythm of intentional living. Uncover hidden sanctuaries and quiet corners designed for your wellbeing.',
-                    backgroundImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=3000&auto=format&fit=crop',
-                    phoneImage: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=1000&auto=format&fit=crop'
-                },
-                philosophy: {
-                    title: 'Philosophy of Presence',
-                    subtitle: 'Why we advocate for a slower urban pace.',
-                    cards: [
-                        { title: 'Mental Clarity', description: 'Reducing noise and visual clutter allows your mind to rest and refocus on what truly matters in the present moment.', icon: 'sparkles' },
-                        { title: 'Heart Rate', description: 'We curate spaces with proven low-decibel environments and high vegetation to naturally lower physiological stress.', icon: 'heart' },
-                        { title: 'Urban Harmony', description: 'Fostering a deeper connection with the quiet natural elements that still exist within our bustling metropolitan homes.', icon: 'leaf' }
-                    ]
-                },
-                cta: {
-                    title: 'Ready to slow down?',
-                    subtitle: 'Join a community of 50,000+ urban dwellers finding their sanctuary in the city.',
-                    buttonText: 'Start Your Journey',
-                    image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop'
-                },
+                hero: settings.hero,
+                philosophy: settings.philosophy,
+                cta: settings.cta,
                 cityInfo,
                 trending,
                 recommended,
@@ -125,22 +172,8 @@ export const homeService = {
                 guides,
                 travelerTypes,
                 categories: CATEGORIES,
-            };
-        }
-
-        return {
-            greeting,
-            cities,
-            hero: settings.hero,
-            philosophy: settings.philosophy,
-            cta: settings.cta,
-            cityInfo,
-            trending,
-            recommended,
-            authenticExperiences,
-            guides,
-            travelerTypes,
-            categories: CATEGORIES,
+                cards,
+            },
         };
     },
 };
