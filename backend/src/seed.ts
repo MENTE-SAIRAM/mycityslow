@@ -18,18 +18,18 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/my-city-sl
 
 // ─── Cities Data ────────────────────────────────────────────
 const citiesData = [
-    { name: 'Bengaluru', slug: 'bengaluru', state: 'Karnataka', description: 'The Garden City — known for its pleasant weather, parks, and lakes.' },
-    { name: 'Mumbai', slug: 'mumbai', state: 'Maharashtra', description: 'The City of Dreams — find hidden pockets of peace amidst the bustle.' },
-    { name: 'Delhi', slug: 'delhi', state: 'Delhi', description: 'The Capital — ancient monuments and quiet heritage spots await.' },
-    { name: 'Hyderabad', slug: 'hyderabad', state: 'Telangana', description: 'The City of Pearls — serene lakes and historic gardens.' },
-    { name: 'Chennai', slug: 'chennai', state: 'Tamil Nadu', description: 'The Gateway to South India — peaceful beaches and temple towns.' },
-    { name: 'Pune', slug: 'pune', state: 'Maharashtra', description: 'The Oxford of the East — hills, gardens, and a vibrant café culture.' },
-    { name: 'Kolkata', slug: 'kolkata', state: 'West Bengal', description: 'The City of Joy — colonial-era parks and riverside walks.' },
-    { name: 'Ahmedabad', slug: 'ahmedabad', state: 'Gujarat', description: 'Heritage City — stepwells, quiet pols, and riverfront walks.' },
-    { name: 'Jaipur', slug: 'jaipur', state: 'Rajasthan', description: 'The Pink City — forts, gardens, and regal calm.' },
-    { name: 'Kochi', slug: 'kochi', state: 'Kerala', description: 'Queen of the Arabian Sea — backwaters, spice gardens, and serenity.' },
-    { name: 'Varanasi', slug: 'varanasi', state: 'Uttar Pradesh', description: 'The spiritual capital of India — ghats, Ganga aarti, and timeless serenity.' },
-    { name: 'Udaipur', slug: 'udaipur', state: 'Rajasthan', description: 'The City of Lakes — romantic sunsets, heritage havelis, and serene boat rides.' },
+    { name: 'Bengaluru', slug: 'bengaluru', state: 'Karnataka', description: 'The Garden City — known for its pleasant weather, parks, and lakes.', image: 'https://images.unsplash.com/photo-1598439210625-5067c578f3f6?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Mumbai', slug: 'mumbai', state: 'Maharashtra', description: 'The City of Dreams — find hidden pockets of peace amidst the bustle.', image: 'https://images.unsplash.com/photo-1529253355930-d2b1f2035c4b?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Delhi', slug: 'delhi', state: 'Delhi', description: 'The Capital — ancient monuments and quiet heritage spots await.', image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Hyderabad', slug: 'hyderabad', state: 'Telangana', description: 'The City of Pearls — serene lakes and historic gardens.', image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Chennai', slug: 'chennai', state: 'Tamil Nadu', description: 'The Gateway to South India — peaceful beaches and temple towns.', image: 'https://images.unsplash.com/photo-1581833055087-0ef44a939b0a?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Pune', slug: 'pune', state: 'Maharashtra', description: 'The Oxford of the East — hills, gardens, and a vibrant café culture.', image: 'https://images.unsplash.com/photo-1624397640148-949b1732bb0f?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Kolkata', slug: 'kolkata', state: 'West Bengal', description: 'The City of Joy — colonial-era parks and riverside walks.', image: 'https://images.unsplash.com/photo-1571757700470-0f7b66eb4813?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Ahmedabad', slug: 'ahmedabad', state: 'Gujarat', description: 'Heritage City — stepwells, quiet pols, and riverfront walks.', image: 'https://images.unsplash.com/photo-1600515911074-18d12708cce6?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Jaipur', slug: 'jaipur', state: 'Rajasthan', description: 'The Pink City — forts, gardens, and regal calm.', image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Kochi', slug: 'kochi', state: 'Kerala', description: 'Queen of the Arabian Sea — backwaters, spice gardens, and serenity.', image: 'https://images.unsplash.com/photo-1593558132623-6849e5d0edff?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Varanasi', slug: 'varanasi', state: 'Uttar Pradesh', description: 'The spiritual capital of India — ghats, Ganga aarti, and timeless serenity.', image: 'https://images.unsplash.com/photo-1569121239039-5ea97e421392?q=80&w=2000&auto=format&fit=crop' },
+    { name: 'Udaipur', slug: 'udaipur', state: 'Rajasthan', description: 'The City of Lakes — romantic sunsets, heritage havelis, and serene boat rides.', image: 'https://images.unsplash.com/photo-1587467538309-de218c1e2f38?q=80&w=2000&auto=format&fit=crop' },
 ];
 
 // ─── Spots Data ─────────────────────────────────────────────
