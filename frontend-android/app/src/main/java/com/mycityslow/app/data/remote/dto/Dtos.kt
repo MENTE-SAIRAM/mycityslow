@@ -19,7 +19,10 @@ data class ExperiencesResponseDto(
 )
 
 data class StoriesResponseDto(
-    @SerializedName("stories") val stories: List<LocalStoryDto>,
+    // community/stories returns either real stories or a "coming soon" placeholder
+    @SerializedName("stories") val stories: List<LocalStoryDto>?,
+    @SerializedName("message") val message: String?,
+    @SerializedName("status") val status: String?,
     @SerializedName("pagination") val pagination: PaginationDto?,
 )
 

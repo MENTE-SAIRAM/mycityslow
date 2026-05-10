@@ -30,6 +30,9 @@ import com.mycityslow.app.presentation.theme.Terracotta
 @Composable
 fun HomeScreen(
     onSpotClick: (String) -> Unit,
+    onSeeAllTrending: () -> Unit = {},
+    onSeeAllExperiences: () -> Unit = {},
+    onSeeAllCategories: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -137,7 +140,7 @@ fun HomeScreen(
                     }
                     "trending_spots" -> {
                         item(key = "trending_$index") {
-                            SectionHeader(title = "🌿 Trending Peaceful Spots")
+                            SectionHeader(title = "🌿 Trending Peaceful Spots", onSeeAll = onSeeAllTrending)
                         }
                         item(key = "trending_content_$index") {
                             val spots = extractSpotList(card.data, "spots")
@@ -164,7 +167,7 @@ fun HomeScreen(
                     }
                     "authentic_experiences" -> {
                         item(key = "experiences_$index") {
-                            SectionHeader(title = "🏡 Authentic Experiences")
+                            SectionHeader(title = "🏡 Authentic Experiences", onSeeAll = onSeeAllExperiences)
                         }
                         item(key = "experiences_content_$index") {
                             val exps = extractExperienceList(card.data, "experiences")
@@ -192,7 +195,7 @@ fun HomeScreen(
                     }
                     "categories" -> {
                         item(key = "categories_$index") {
-                            SectionHeader(title = "Explore by Category")
+                            SectionHeader(title = "Explore by Category", onSeeAll = onSeeAllCategories)
                         }
                         item(key = "categories_content_$index") {
                             val categories = extractCategoryList(card.data, "categories")
@@ -366,7 +369,7 @@ private fun CategoryChip(category: CategoryItem) {
 }
 
 @Composable
-fun SectionHeader(title: String) {
+fun SectionHeader(title: String, onSeeAll: () -> Unit = { }) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -379,7 +382,7 @@ fun SectionHeader(title: String) {
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        TextButton(onClick = { }) {
+        TextButton(onClick = onSeeAll) {
             Text("See All", color = SageGreen)
         }
     }

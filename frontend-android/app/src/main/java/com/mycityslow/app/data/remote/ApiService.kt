@@ -57,7 +57,7 @@ interface ApiService {
     ): ApiResponseDto<HomeDataDto>
 
     // Stories
-    @GET("stories")
+    @GET("community/stories")
     suspend fun getStories(
         @Query("city") city: String? = null,
         @Query("page") page: Int = 1,

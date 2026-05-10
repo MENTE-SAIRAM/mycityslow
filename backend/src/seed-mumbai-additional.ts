@@ -144,6 +144,34 @@ const additionalMumbaiSpots = [
     },
 ];
 
+const spotCategoryImages: Record<string, string[]> = {
+    parks: [
+        'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1400&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?q=80&w=1400&auto=format&fit=crop',
+    ],
+    temple: [
+        'https://images.unsplash.com/photo-1532664189809-02133fee698d?q=80&w=1400&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=1400&auto=format&fit=crop',
+    ],
+    gardens: [
+        'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?q=80&w=1400&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1463320726281-696a485928c7?q=80&w=1400&auto=format&fit=crop',
+    ],
+    sunset: [
+        'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1400&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1493244040629-496f6d136cc3?q=80&w=1400&auto=format&fit=crop',
+    ],
+    default: [
+        'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=1400&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=1400&auto=format&fit=crop',
+    ],
+};
+
+function getSpotImages(categories: string[] = []): string[] {
+    const primaryCategory = categories[0]?.toLowerCase();
+    return spotCategoryImages[primaryCategory] || spotCategoryImages.default;
+}
+
 async function seedAdditionalMumbaiSpots() {
     try {
         await mongoose.connect(MONGO_URI);
@@ -173,7 +201,7 @@ async function seedAdditionalMumbaiSpots() {
                 city: mumbaiCity._id,
                 isApproved: true,
                 isFeatured: false,
-                images: [],
+                images: getSpotImages(spotData.categories),
                 transportation: '',
             });
 

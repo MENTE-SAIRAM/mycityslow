@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.mycityslow.app.data.local.UserPreferencesStore
 import com.mycityslow.app.presentation.screens.discovery.DiscoveryScreen
 import com.mycityslow.app.presentation.screens.experiences.ExperiencesScreen
@@ -94,14 +95,20 @@ fun NavGraph(
             modifier = Modifier.padding(paddingValues),
         ) {
             // Onboarding
-            composable(Screen.Onboarding.route) {
+            composable(
+                route = Screen.Onboarding.route,
+                deepLinks = listOf(navDeepLink { uriPattern = "https://mycityslow.app/onboarding" })
+            ) {
                 OnboardingWelcomeScreen(
                     onGetStarted = {
                         navController.navigate(Screen.OnboardingCity.route)
                     }
                 )
             }
-            composable(Screen.OnboardingCity.route) {
+            composable(
+                route = Screen.OnboardingCity.route,
+                deepLinks = listOf(navDeepLink { uriPattern = "https://mycityslow.app/onboarding/city" })
+            ) {
                 OnboardingCityScreen(
                     preferencesStore = preferencesStore,
                     onCitySelected = {
@@ -109,7 +116,10 @@ fun NavGraph(
                     }
                 )
             }
-            composable(Screen.OnboardingInterests.route) {
+            composable(
+                route = Screen.OnboardingInterests.route,
+                deepLinks = listOf(navDeepLink { uriPattern = "https://mycityslow.app/onboarding/interests" })
+            ) {
                 OnboardingInterestsScreen(
                     preferencesStore = preferencesStore,
                     onComplete = {
@@ -122,24 +132,63 @@ fun NavGraph(
             }
 
             // Main tabs
-            composable(Screen.Home.route) {
+            composable(
+                route = Screen.Home.route,
+                deepLinks = listOf(navDeepLink { uriPattern = "https://mycityslow.app/home" })
+            ) {
                 HomeScreen(
                     onSpotClick = { id ->
                         navController.navigate(Screen.SpotDetail.createRoute(id))
-                    }
+                    },
+                    onSeeAllTrending = {
+                        navController.navigate(Screen.Discovery.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onSeeAllExperiences = {
+                        navController.navigate(Screen.Experiences.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onSeeAllCategories = {
+                        navController.navigate(Screen.Discovery.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
                 )
             }
-            composable(Screen.Discovery.route) {
+            composable(
+                route = Screen.Discovery.route,
+                deepLinks = listOf(navDeepLink { uriPattern = "https://mycityslow.app/discover" })
+            ) {
                 DiscoveryScreen(
                     onSpotClick = { id ->
                         navController.navigate(Screen.SpotDetail.createRoute(id))
                     }
                 )
             }
-            composable(Screen.Experiences.route) {
+            composable(
+                route = Screen.Experiences.route,
+                deepLinks = listOf(navDeepLink { uriPattern = "https://mycityslow.app/experiences" })
+            ) {
                 ExperiencesScreen()
             }
-            composable(Screen.MyList.route) {
+            composable(
+                route = Screen.MyList.route,
+                deepLinks = listOf(navDeepLink { uriPattern = "https://mycityslow.app/my-list" })
+            ) {
                 MyListScreen(
                     onSpotClick = { id ->
                         navController.navigate(Screen.SpotDetail.createRoute(id))
@@ -150,7 +199,10 @@ fun NavGraph(
             // Detail screens
             composable(
                 route = Screen.SpotDetail.route,
-                arguments = listOf(navArgument("id") { type = NavType.StringType })
+                arguments = listOf(navArgument("id") { type = NavType.StringType }),
+                deepLinks = listOf(
+                    navDeepLink { uriPattern = "https://mycityslow.app/spot/{id}" },
+                )
             ) { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id") ?: ""
                 SpotDetailScreen(
