@@ -6,6 +6,20 @@ plugins {
     // id("com.google.gms.google-services") // Uncomment when google-services.json is added
 }
 
+val mapsApiKey: String by lazy {
+    val localProps = rootProject.file("local.properties")
+    if (localProps.exists()) {
+        val lines = localProps.readLines()
+        for (line in lines) {
+            val trimmed = line.trim()
+            if (trimmed.startsWith("MAPS_API_KEY=")) {
+                return@lazy trimmed.substringAfter("=").trim()
+            }
+        }
+    }
+    project.findProperty("MAPS_API_KEY")?.toString() ?: "YOUR_GOOGLE_MAPS_API_KEY"
+}
+
 android {
     namespace = "com.mycityslow.app"
     compileSdk = 34
@@ -21,6 +35,7 @@ android {
         vectorDrawables { useSupportLibrary = true }
 
         buildConfigField("String", "API_BASE_URL", "\"https://mycityslow.onrender.com/api/\"")
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
