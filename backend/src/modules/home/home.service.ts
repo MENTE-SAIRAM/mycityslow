@@ -34,16 +34,30 @@ async function fetchWeather(lat: number, lng: number) {
 
 async function findNearestCity(lat: number, lng: number) {
     try {
-        const city = await City.findOne({
-            location: {
-                $near: {
-                    $geometry: { type: 'Point', coordinates: [lng, lat] },
-                    $maxDistance: 50000,
+        const spots = await Spot.aggregate([
+            {
+                $geoNear: {
+                    near: { type: 'Point', coordinates: [lng, lat] },
+                    distanceField: 'distance',
+                    maxDistance: 50000,
+                    spherical: true,
+                    query: { isApproved: true },
                 },
             },
-            isActive: true,
-        });
-        return city;
+            { $sort: { distance: 1 } },
+            { $limit: 1 },
+            {
+                $lookup: {
+                    from: 'cities',
+                    localField: 'city',
+                    foreignField: '_id',
+                    as: 'city',
+                },
+            },
+            { $unwind: { path: '$city', preserveNullAndEmptyArrays: true } },
+            { $replaceRoot: { newRoot: '$city' } },
+        ]);
+        return spots.length > 0 ? spots[0] : null;
     } catch (_) {
         return null;
     }

@@ -112,7 +112,8 @@ export const spotsService = {
 
         // Vibe, bestTime, crowdLevel filters
         if (query.vibe) {
-            filter.vibe = { $regex: `^${query.vibe.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' };
+            const vibeRegex = query.vibe.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            filter.vibe = { $regex: '^' + vibeRegex + '$', $options: 'i' };
         }
         if (query.bestTime) filter.bestTime = query.bestTime;
         if (query.crowdLevel) filter.crowdLevel = query.crowdLevel;
@@ -128,27 +129,12 @@ export const spotsService = {
 
         // Text search
         if (query.search) {
-            const escaped = query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             filter.$or = [
-                { title: { $regex: escaped, $options: 'i' } },
-                { description: { $regex: escaped, $options: 'i' } },
-                { tags: { $regex: escaped, $options: 'i' } },
-                { 'categories': { $regex: escaped, $options: 'i' } },
+                { title: { $regex: query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } },
+                { description: { $regex: query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } },
+                { address: { $regex: query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } },
+                { categories: { $elemMatch: { $regex: query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } } },
             ];
-        }
-
-        // Geospatial — nearby (if lat/lng provided)
-        if (query.lat && query.lng) {
-            const radiusInMeters = (query.radius || 10) * 1000; // default 10km
-            filter.location = {
-                $near: {
-                    $geometry: {
-                        type: 'Point',
-                        coordinates: [query.lng, query.lat],
-                    },
-                    $maxDistance: radiusInMeters,
-                },
-            };
         }
 
         const [spots, total] = await Promise.all([
@@ -156,7 +142,8 @@ export const spotsService = {
                 .populate('city', 'name slug')
                 .sort({ peaceScore: -1, createdAt: -1 })
                 .skip(skip)
-                .limit(limit),
+                .limit(limit)
+                .lean(),
             Spot.countDocuments(filter),
         ]);
 
