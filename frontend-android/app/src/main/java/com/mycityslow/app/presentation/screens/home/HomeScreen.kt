@@ -2,6 +2,7 @@ package com.mycityslow.app.presentation.screens.home
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +10,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.NearMe
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,9 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.mycityslow.app.presentation.components.SpotCard
 import com.mycityslow.app.presentation.theme.SageGreen
-import com.mycityslow.app.presentation.theme.Terracotta
 
 @Composable
 fun HomeScreen(
@@ -65,6 +68,11 @@ fun HomeScreen(
         return
     }
 
+    val greetingCard = state.cards.firstOrNull { it.type == "greeting" }?.data
+    val heroCard = state.cards.firstOrNull { it.type == "hero_card" }?.data
+    val trendingCard = state.cards.firstOrNull { it.type == "trending_spots" }?.data
+    val categoriesCard = state.cards.firstOrNull { it.type == "categories" }?.data
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -83,141 +91,75 @@ fun HomeScreen(
                 }
             }
         } else {
-            val cards = state.cards
-            cards.forEachIndexed { index, card ->
-                when (card.type) {
-                    "trending_spots" -> {
-                        item(key = "trending_header_$index") {
-                                                        val title = extractString(card.data, "title") ?: "🌿 Trending Peaceful Spots"
-                            SectionHeader(
-                                title = title,
-                                onSeeAll = onSeeAllTrending
-                            )
-                        }
-                        item(key = "trending_content_$index") {
-                            val spots = extractSpotList(card.data, "spots")
-                            if (spots.isNotEmpty()) {
-                                LazyRow(
-                                    contentPadding = PaddingValues(horizontal = 24.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                ) {
-                                    items(spots) { spot ->
-                                        SpotCard(
-                                            spot = spot,
-                                            onClick = {
-                                                if (spot.id.isNotBlank()) {
-                                                    onSpotClick(spot.id)
-                                                }
-                                            },
-                                            modifier = Modifier.width(280.dp),
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
-                        }
-                    }
-                    "authentic_experiences" -> {
-                        item(key = "experiences_header_$index") {
-                                                        val title = extractString(card.data, "title") ?: "🏡 Authentic Experiences"
-                            SectionHeader(
-                                title = title,
-                                onSeeAll = onSeeAllExperiences
-                            )
-                        }
-                        item(key = "experiences_content_$index") {
-                            val exps = extractExperienceList(card.data, "experiences")
-                            if (exps.isNotEmpty()) {
-                                LazyRow(
-                                    contentPadding = PaddingValues(horizontal = 24.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                ) {
-                                    items(exps) { exp ->
-                                        ExperienceCard(experience = exp, onClick = { expId ->
-                                            // Navigate to experience detail
-                                        })
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
-                        }
-                    }
-                    "categories" -> {
-                        item(key = "categories_header_$index") {
-                                                        val title = extractString(card.data, "title") ?: "🎯 Explore by Vibe"
-                            SectionHeader(
-                                title = title,
-                                onSeeAll = onSeeAllCategories
-                            )
-                        }
-                        item(key = "categories_content_$index") {
-                            val categories = extractCategoryList(card.data, "categories")
-                            if (categories.isNotEmpty()) {
-                                CategoriesGrid(categories)
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
-                        }
-                    }
-                    "first_time_guide" -> {
-                        item(key = "guide_$index") {
-                            val cityName = extractString(card.data, "cityName")
-                            if (cityName != null) {
-                                FirstTimeGuideCard(
-                                    cityName = cityName,
-                                    onNavigateGuide = { /* Navigate to guides screen */ }
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
-                        }
-                    }
-                    "hero_card" -> {
-                        item(key = "hero_card_$index") {
-                            val cityName = extractString(card.data, "cityName")
-                            val weather = extractString(card.data, "weather")
-                            val weatherStatus = extractString(card.data, "weatherStatus")
-                            val weatherIcon = extractString(card.data, "weatherIcon")
-                            val description = extractString(card.data, "description")
-                            val buttonText = extractString(card.data, "buttonText")
+            item(key = "top_bar") {
+                HomeTopBar(
+                    locationLabel = extractString(heroCard, "locationLabel").orEmpty(),
+                    greeting = extractString(greetingCard, "greeting").orEmpty(),
+                    profileImageUrl = extractString(heroCard, "profileImage").orEmpty(),
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
-                            if (cityName != null) {
-                                CityHeroCard(
-                                    cityName = cityName,
-                                    weather = weather ?: "",
-                                    weatherStatus = weatherStatus ?: "",
-                                    weatherIcon = weatherIcon ?: "",
-                                    description = description ?: "",
-                                    buttonText = buttonText ?: "",
-                                    onExploreCityClick = { onCityClick(cityName) }
-                                )
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
+            item(key = "hero") {
+                val cityName = extractString(heroCard, "cityName")
+                if (!cityName.isNullOrBlank()) {
+                    CityHeroCard(
+                        cityName = cityName,
+                        weather = extractString(heroCard, "weather").orEmpty(),
+                        weatherStatus = extractString(heroCard, "weatherStatus").orEmpty(),
+                        weatherIcon = extractString(heroCard, "weatherIcon").orEmpty(),
+                        description = extractString(heroCard, "description").orEmpty(),
+                        buttonText = extractString(heroCard, "buttonText").orEmpty(),
+                        backgroundImage = extractString(heroCard, "backgroundImage").orEmpty(),
+                        onExploreCityClick = { onCityClick(cityName) },
+                    )
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            item(key = "trending_header") {
+                val title = extractString(trendingCard, "title")
+                SectionHeader(
+                    title = title.orEmpty(),
+                    seeAllText = extractString(trendingCard, "seeAllText"),
+                    onSeeAll = onSeeAllTrending,
+                )
+            }
+
+            item(key = "trending_content") {
+                val spots = extractSpotList(trendingCard, "spots")
+                if (spots.isNotEmpty()) {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        items(spots) { spot ->
+                            FigmaTrendingSpotCard(
+                                spot = spot,
+                                onClick = {
+                                    if (spot.id.isNotBlank()) onSpotClick(spot.id)
+                                },
+                            )
                         }
                     }
-                    "greeting" -> {
-                        item(key = "greeting_$index") {
-                            val greeting = extractString(card.data, "greeting")
-                            if (!greeting.isNullOrBlank()) {
-                                Text(
-                                    text = greeting,
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                                )
-                            }
-                        }
-                    }
-                    "traveler_types" -> {
-                        item(key = "traveler_types_$index") {
-                            val types = extractTravelerTypesList(card.data, "types")
-                            val title = extractString(card.data, "title")
-                            if (types.isNotEmpty() && !title.isNullOrBlank()) {
-                                SectionHeader(title = title, onSeeAll = { })
-                                TravelerTypesGrid(types)
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(28.dp))
+                }
+            }
+
+            item(key = "categories_header") {
+                val title = extractString(categoriesCard, "title")
+                SectionHeader(
+                    title = title.orEmpty(),
+                    seeAllText = extractString(categoriesCard, "seeAllText"),
+                    onSeeAll = onSeeAllCategories,
+                )
+            }
+
+            item(key = "categories_content") {
+                val categories = extractCategoryList(categoriesCard, "categories")
+                if (categories.isNotEmpty()) {
+                    CategoriesGrid(categories)
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
             }
         }
@@ -264,6 +206,56 @@ private fun extractTravelerTypesList(data: Map<String, Any>?, key: String): List
 }
 
 @Composable
+private fun HomeTopBar(
+    locationLabel: String,
+    greeting: String,
+    profileImageUrl: String,
+) {
+    Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Outlined.LocationOn,
+                contentDescription = null,
+                tint = Color(0xFF8A8A83),
+                modifier = Modifier.size(14.dp),
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = locationLabel,
+                style = MaterialTheme.typography.labelMedium,
+                color = Color(0xFF6C6C66),
+                fontWeight = FontWeight.Medium,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = greeting,
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color(0xFF141414),
+                fontWeight = FontWeight.Medium,
+            )
+
+            AsyncImage(
+                model = profileImageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .border(1.dp, Color(0xFFCFCEC8), CircleShape),
+                contentScale = ContentScale.Crop,
+            )
+        }
+    }
+}
+
+@Composable
 private fun CityHeroCard(
     cityName: String,
     weather: String,
@@ -271,68 +263,172 @@ private fun CityHeroCard(
     weatherIcon: String,
     description: String,
     buttonText: String,
+    backgroundImage: String,
     onExploreCityClick: () -> Unit = { },
 ) {
-    Card(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .clickable { onExploreCityClick() },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+            .clip(RoundedCornerShape(24.dp)),
     ) {
-        Column(
+        AsyncImage(
+            model = backgroundImage,
+            contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .height(420.dp),
+            contentScale = ContentScale.Crop,
+        )
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        0f to Color.Black.copy(alpha = 0.12f),
+                        0.55f to Color.Transparent,
+                        1f to Color.Black.copy(alpha = 0.45f),
+                    )
+                )
+        )
+
+        Surface(
+            modifier = Modifier
+                .padding(start = 22.dp, top = 22.dp),
+            shape = RoundedCornerShape(20.dp),
+            color = Color(0x8A667066),
+            tonalElevation = 0.dp,
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+                Text(
+                    text = "$weatherIcon $weather",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = "$weatherStatus in $cityName",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(horizontal = 22.dp, vertical = 20.dp),
         ) {
             Text(
-                text = cityName.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "$weatherIcon $weather",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = "$weatherStatus in $cityName",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
                 text = description,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White,
+                fontWeight = FontWeight.Medium,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             Button(
-                onClick = { onExploreCityClick() },
-                modifier = Modifier.fillMaxWidth(),
+                onClick = onExploreCityClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SageGreen),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA8C3AF)),
             ) {
                 Text(
                     text = buttonText,
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelLarge,
+                    color = Color(0xFF264238),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FigmaTrendingSpotCard(
+    spot: com.mycityslow.app.domain.model.Spot,
+    onClick: () -> Unit,
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.width(282.dp),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F1EC)),
+    ) {
+        Column {
+            Box {
+                AsyncImage(
+                    model = spot.images.firstOrNull().orEmpty(),
+                    contentDescription = spot.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(190.dp)
+                        .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)),
+                    contentScale = ContentScale.Crop,
+                )
+
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(10.dp),
+                    shape = CircleShape,
+                    color = Color(0xFFEDEAE2),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.BookmarkBorder,
+                        contentDescription = null,
+                        tint = Color(0xFF42423E),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(18.dp),
+                    )
+                }
+            }
+
+            Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+                Text(
+                    text = spot.name,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color(0xFF1E1E1A),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Outlined.NearMe,
+                        contentDescription = null,
+                        tint = Color(0xFF76766F),
+                        modifier = Modifier.size(14.dp),
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (spot.location.lat != 0.0 || spot.location.lng != 0.0) "Nearby" else "",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF76766F),
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items((spot.tags.ifEmpty { listOf(spot.category) }).take(2)) { tag ->
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color(0xFFD4E5D5),
+                        ) {
+                            Text(
+                                text = tag.uppercase(),
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color(0xFF3D5C4D),
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -534,24 +630,32 @@ private fun CategoriesGrid(categories: List<CategoryItem>) {
                         modifier = Modifier
                             .weight(1f)
                             .clickable { },
-                        shape = RoundedCornerShape(16.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(22.dp),
+                        color = Color(0xFFF3F1EC),
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            Text(
-                                text = category.icon,
-                                style = MaterialTheme.typography.headlineSmall,
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = colorFromHex(category.color).copy(alpha = 0.28f),
+                            ) {
+                                Text(
+                                    text = category.icon,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(14.dp))
                             Text(
                                 text = category.name,
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color(0xFF1E1E1A),
                                 textAlign = TextAlign.Center,
                                 maxLines = 2,
+                                fontWeight = FontWeight.Medium,
                             )
                         }
                     }
@@ -564,23 +668,47 @@ private fun CategoriesGrid(categories: List<CategoryItem>) {
     }
 }
 
+private fun colorFromHex(hex: String): Color {
+    val normalized = hex.trim().removePrefix("#")
+    return try {
+        when (normalized.length) {
+            6 -> Color(normalized.toLong(16) or 0x00000000FF000000)
+            8 -> Color(normalized.toLong(16))
+            else -> Color(0xFF8AAE94)
+        }
+    } catch (_: Exception) {
+        Color(0xFF8AAE94)
+    }
+}
+
 @Composable
-fun SectionHeader(title: String, onSeeAll: () -> Unit = { }) {
+fun SectionHeader(
+    title: String,
+    seeAllText: String? = null,
+    onSeeAll: () -> Unit = { },
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+            .padding(horizontal = 24.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color(0xFF1C1C19),
+            fontWeight = FontWeight.Medium,
         )
-        TextButton(onClick = onSeeAll) {
-            Text("See All", color = SageGreen, style = MaterialTheme.typography.labelLarge)
+        if (!seeAllText.isNullOrBlank()) {
+            TextButton(onClick = onSeeAll) {
+                Text(
+                    text = seeAllText,
+                    color = Color(0xFF2E5A45),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
         }
     }
 }

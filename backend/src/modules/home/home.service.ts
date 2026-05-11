@@ -104,12 +104,16 @@ export const homeService = {
                         if (!card.data) return card;
             if (card.type === 'traveler_types') {
                 (card.data as any).title = 'Who Are You?';
+                (card.data as any).seeAllText = 'See All';
             } else if (card.type === 'trending_spots') {
-                (card.data as any).title = '🌿 Trending Peaceful Spots';
+                (card.data as any).title = 'Trending Peaceful Spots';
+                (card.data as any).seeAllText = 'See All';
             } else if (card.type === 'authentic_experiences') {
-                (card.data as any).title = '🏡 Authentic Experiences';
+                (card.data as any).title = 'Authentic Experiences';
+                (card.data as any).seeAllText = 'See All';
             } else if (card.type === 'categories') {
-                (card.data as any).title = '🎯 Explore by Vibe';
+                (card.data as any).title = 'Explore by Vibe';
+                (card.data as any).seeAllText = 'See All';
             }
             return card;
         });
@@ -121,11 +125,13 @@ export const homeService = {
                 data: {
                     cityName: cityInfo.name,
                     citySlug: cityInfo.slug,
+                    locationLabel: cityInfo.name.toUpperCase(),
                     weather: '24°C',
                     weatherStatus: 'Clear Skies',
                     weatherIcon: '☀️',
                     description: 'Escape the noise in your own city.',
                     buttonText: `Explore ${cityInfo.name} →`,
+                    profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop',
                     backgroundImage: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2000&auto=format&fit=crop',
                 },
             });
