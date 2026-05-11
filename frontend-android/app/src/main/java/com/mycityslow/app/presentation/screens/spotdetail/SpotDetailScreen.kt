@@ -56,11 +56,9 @@ fun SpotDetailScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val uiText = state.uiText
-    val pageBg = Color(0xFFF1EFEA)
-    val sectionBg = Color(0xFFE8E4DD)
 
     Scaffold(
-        containerColor = pageBg,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             if (!state.isLoading && state.spot != null) {
                 BottomActionBar(
@@ -101,7 +99,7 @@ fun SpotDetailScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
-                        .background(pageBg)
+                        .background(MaterialTheme.colorScheme.background)
                         .verticalScroll(rememberScrollState()),
                 ) {
                     HeroSection(
@@ -118,7 +116,7 @@ fun SpotDetailScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .offset(y = (-30).dp)
+                            .offset(y = (-16).dp)
                             .padding(horizontal = 14.dp),
                     ) {
                         PeaceScoreCard(
@@ -126,17 +124,18 @@ fun SpotDetailScreen(
                             vibe = spot.vibe,
                             bestTime = spot.bestTime,
                             uiText = uiText,
-                            background = sectionBg,
                         )
                     }
 
                     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
                         val bodyText = if (spot.longDescription.isNotBlank()) spot.longDescription else spot.description
                         if (bodyText.isNotBlank()) {
                             Text(
                                 text = bodyText,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Color(0xFF2A2A2A),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 lineHeight = MaterialTheme.typography.bodyLarge.lineHeight,
                             )
                             Spacer(modifier = Modifier.height(24.dp))
@@ -146,7 +145,6 @@ fun SpotDetailScreen(
                         Spacer(modifier = Modifier.height(10.dp))
                         BestTimeInsightsCard(
                             uiText = uiText,
-                            background = sectionBg,
                             chartHeights = state.cardData.bestTimeHeights,
                         )
 
@@ -164,7 +162,7 @@ fun SpotDetailScreen(
                                     applyValueTemplate(uiText.distanceAwayTemplate, String.format("%.1f", it))
                                 } ?: uiText.mapFallbackDistanceLabel,
                                 style = MaterialTheme.typography.labelMedium,
-                                color = Color(0xFF5F5F5F),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
 
@@ -343,14 +341,13 @@ private fun PeaceScoreCard(
     vibe: String,
     bestTime: String,
     uiText: com.mycityslow.app.data.repository.SpotRepository.SpotDetailUiText,
-    background: Color,
 ) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(10.dp, RoundedCornerShape(20.dp)),
         shape = RoundedCornerShape(20.dp),
-        color = background,
+        color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
         Row(
             modifier = Modifier
@@ -363,20 +360,20 @@ private fun PeaceScoreCard(
                 Text(
                     text = uiText.peaceScoreLabel,
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFF5D5D5D),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         text = String.format("%.1f", peaceScore),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2F6A4F),
+                        color = SageGreen,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = uiText.peaceScoreSuffix,
                         style = MaterialTheme.typography.labelMedium,
-                        color = Color(0xFF7A7A7A),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -385,13 +382,13 @@ private fun PeaceScoreCard(
                 modifier = Modifier
                     .size(54.dp)
                     .clip(CircleShape)
-                    .border(3.dp, Color(0xFF2F6A4F), CircleShape),
+                    .border(3.dp, SageGreen, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Explore,
                     contentDescription = null,
-                    tint = Color(0xFF2F6A4F),
+                    tint = SageGreen,
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -408,17 +405,17 @@ private fun PeaceScoreCard(
 
 @Composable
 private fun DetailChip(icon: ImageVector, text: String) {
-    Surface(shape = RoundedCornerShape(50), color = Color(0xFFD3DCCE)) {
+    Surface(shape = RoundedCornerShape(50), color = MaterialTheme.colorScheme.surfaceVariant) {
         Row(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFF2B4738))
+            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(14.dp), tint = SageGreen)
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelSmall,
-                color = Color(0xFF2B4738),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -429,7 +426,7 @@ private fun SectionTitle(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleLarge,
-        color = Color(0xFF1E1E1E),
+        color = MaterialTheme.colorScheme.onBackground,
         fontWeight = FontWeight.SemiBold,
     )
 }
@@ -437,7 +434,6 @@ private fun SectionTitle(title: String) {
 @Composable
 private fun BestTimeInsightsCard(
     uiText: com.mycityslow.app.data.repository.SpotRepository.SpotDetailUiText,
-    background: Color,
     chartHeights: List<Int> = emptyList(),
 ) {
     val labels = if (uiText.bestTimeChartLabels.isNotEmpty()) uiText.bestTimeChartLabels else emptyList()
@@ -451,7 +447,7 @@ private fun BestTimeInsightsCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = background,
+        color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(
@@ -466,16 +462,16 @@ private fun BestTimeInsightsCard(
                                 .width(22.dp)
                                 .height(heights.getOrNull(index) ?: 24.dp)
                                 .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp, bottomStart = 3.dp, bottomEnd = 3.dp))
-                                .background(if (index == highlightIndex) Color(0xFF8DB39E) else Color(0xFFCED8CC)),
+                                .background(if (index == highlightIndex) SageGreen else MaterialTheme.colorScheme.surface),
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(labels[index], style = MaterialTheme.typography.labelSmall, color = Color(0xFF3E3E3E))
+                        Text(labels[index], style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = uiText.bestTimeInsightText, style = MaterialTheme.typography.bodySmall, color = Color(0xFF4E4E4E))
+            Text(text = uiText.bestTimeInsightText, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -492,11 +488,12 @@ private fun ReachabilityMapCard(
         position = CameraPosition.fromLatLngZoom(location, 14f)
     }
 
-    Box(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
+            .height(250.dp)
             .clip(RoundedCornerShape(20.dp)),
+        color = MaterialTheme.colorScheme.surface,
     ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -567,7 +564,7 @@ private fun NearbySpotsRow(
         Text(
             text = uiText.noNearbySpotsText,
             style = MaterialTheme.typography.bodySmall,
-            color = Color(0xFF666666),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         return
     }
@@ -586,14 +583,14 @@ private fun NearbySpotsRow(
                         .fillMaxWidth()
                         .height(112.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFFDCD8D0)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentScale = ContentScale.Crop,
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = item.title,
                     style = MaterialTheme.typography.labelLarge,
-                    color = Color(0xFF222222),
+                    color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -602,7 +599,7 @@ private fun NearbySpotsRow(
                         applyValueTemplate(uiText.distanceChipTemplate, String.format("%.1f", it))
                     } ?: uiText.nearbyFallbackDistanceLabel,
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFF666666),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -616,7 +613,7 @@ private fun BottomActionBar(
     onToggleSave: () -> Unit,
     onStartWalk: () -> Unit,
 ) {
-    Surface(color = Color(0xFFF1EFEA)) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -628,7 +625,7 @@ private fun BottomActionBar(
                 onClick = onToggleSave,
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5E7D67)),
+                colors = ButtonDefaults.buttonColors(containerColor = SageGreen),
             ) {
                 Icon(
                     imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
@@ -654,11 +651,11 @@ private fun BottomActionBar(
                 Icon(
                     imageVector = Icons.Outlined.Explore,
                     contentDescription = null,
-                    tint = Color(0xFF1F3A2C),
+                    tint = SageGreen,
                     modifier = Modifier.size(16.dp),
                 )
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(uiText.startWalkingText, color = Color(0xFF1F3A2C), style = MaterialTheme.typography.labelLarge)
+                Text(uiText.startWalkingText, color = SageGreen, style = MaterialTheme.typography.labelLarge)
             }
         }
     }

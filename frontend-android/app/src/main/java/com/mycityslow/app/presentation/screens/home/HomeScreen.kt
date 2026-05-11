@@ -33,6 +33,7 @@ fun HomeScreen(
     onSeeAllTrending: () -> Unit = {},
     onSeeAllExperiences: () -> Unit = {},
     onSeeAllCategories: () -> Unit = {},
+    onCityClick: (String) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,34 +70,6 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
-        item {
-            Column(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
-            ) {
-                if (state.isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.Gray.copy(alpha = 0.3f))
-                    )
-                } else {
-                    Text(
-                        text = state.greeting,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Discover peaceful spots in your city",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-
         if (state.isLoading && state.cards.isEmpty()) {
             item {
                 Box(
@@ -112,35 +85,13 @@ fun HomeScreen(
             val cards = state.cards
             cards.forEachIndexed { index, card ->
                 when (card.type) {
-                    "traveler_types" -> {
-                        item(key = "traveler_types_$index") {
-                            val types = extractList(card.data, "types")
-                            if (types.isNotEmpty()) {
-                                LazyRow(
-                                    contentPadding = PaddingValues(horizontal = 24.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    items(types) { type ->
-                                        Surface(
-                                            shape = RoundedCornerShape(20.dp),
-                                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                                        ) {
-                                            Text(
-                                                text = type,
-                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                                style = MaterialTheme.typography.labelLarge,
-                                                color = MaterialTheme.colorScheme.primary,
-                                            )
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(12.dp))
-                            }
-                        }
-                    }
                     "trending_spots" -> {
-                        item(key = "trending_$index") {
-                            SectionHeader(title = "🌿 Trending Peaceful Spots", onSeeAll = onSeeAllTrending)
+                        item(key = "trending_header_$index") {
+                                                        val title = extractString(card.data, "title") ?: "🌿 Trending Peaceful Spots"
+                            SectionHeader(
+                                title = title,
+                                onSeeAll = onSeeAllTrending
+                            )
                         }
                         item(key = "trending_content_$index") {
                             val spots = extractSpotList(card.data, "spots")
@@ -166,8 +117,12 @@ fun HomeScreen(
                         }
                     }
                     "authentic_experiences" -> {
-                        item(key = "experiences_$index") {
-                            SectionHeader(title = "🏡 Authentic Experiences", onSeeAll = onSeeAllExperiences)
+                        item(key = "experiences_header_$index") {
+                                                        val title = extractString(card.data, "title") ?: "🏡 Authentic Experiences"
+                            SectionHeader(
+                                title = title,
+                                onSeeAll = onSeeAllExperiences
+                            )
                         }
                         item(key = "experiences_content_$index") {
                             val exps = extractExperienceList(card.data, "experiences")
@@ -177,9 +132,27 @@ fun HomeScreen(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                                 ) {
                                     items(exps) { exp ->
-                                        ExperienceCard(experience = exp, onClick = { })
+                                        ExperienceCard(experience = exp, onClick = { expId ->
+                                            // Navigate to experience detail
+                                        })
                                     }
                                 }
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
+                    }
+                    "categories" -> {
+                        item(key = "categories_header_$index") {
+                                                        val title = extractString(card.data, "title") ?: "🎯 Explore by Vibe"
+                            SectionHeader(
+                                title = title,
+                                onSeeAll = onSeeAllCategories
+                            )
+                        }
+                        item(key = "categories_content_$index") {
+                            val categories = extractCategoryList(card.data, "categories")
+                            if (categories.isNotEmpty()) {
+                                CategoriesGrid(categories)
                                 Spacer(modifier = Modifier.height(24.dp))
                             }
                         }
@@ -188,27 +161,11 @@ fun HomeScreen(
                         item(key = "guide_$index") {
                             val cityName = extractString(card.data, "cityName")
                             if (cityName != null) {
-                                FirstTimeGuideCard(cityName = cityName)
+                                FirstTimeGuideCard(
+                                    cityName = cityName,
+                                    onNavigateGuide = { /* Navigate to guides screen */ }
+                                )
                                 Spacer(modifier = Modifier.height(16.dp))
-                            }
-                        }
-                    }
-                    "categories" -> {
-                        item(key = "categories_$index") {
-                            SectionHeader(title = "Explore by Category", onSeeAll = onSeeAllCategories)
-                        }
-                        item(key = "categories_content_$index") {
-                            val categories = extractCategoryList(card.data, "categories")
-                            if (categories.isNotEmpty()) {
-                                LazyRow(
-                                    contentPadding = PaddingValues(horizontal = 24.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                ) {
-                                    items(categories) { cat ->
-                                        CategoryChip(cat)
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(24.dp))
                             }
                         }
                     }
@@ -219,6 +176,43 @@ fun HomeScreen(
         item { Spacer(modifier = Modifier.height(16.dp)) }
     }
 }
+                    "hero_card" -> {
+                        item(key = "city_info_$index") {
+                            val cityName = extractString(card.data, "cityName")
+                            val citySlug = extractString(card.data, "citySlug")
+                            val weather = extractString(card.data, "weather")
+                            val weatherStatus = extractString(card.data, "weatherStatus")
+                            val weatherIcon = extractString(card.data, "weatherIcon")
+                            val description = extractString(card.data, "description")
+                            val buttonText = extractString(card.data, "buttonText")
+                            if (cityName != null) {
+                                CityHeroCard(
+                                    cityName = cityName,
+                                    weather = weather ?: "24°C",
+                                    weatherStatus = weatherStatus ?: "Clear Skies",
+                                    weatherIcon = weatherIcon ?: "☀️",
+                                    description = description ?: "Escape the noise in your own city.",
+                                    buttonText = buttonText ?: "Explore $cityName →",
+                                    onExploreCityClick = { /* Navigate to city */ }
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
+                    }
+                    "greeting" -> {
+                        // Greeting is handled in backend cards
+                    }
+                    "traveler_types" -> {
+                        item(key = "traveler_types_$index") {
+                            val types = extractTravelerTypesList(card.data, "types")
+                                                        val title = extractString(card.data, "title") ?: "Who Are You?"
+                            if (types.isNotEmpty()) {
+                                SectionHeader(title = title, onSeeAll = { })
+                                TravelerTypesGrid(types)
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
+                    }
 
 private fun extractString(data: Map<String, Any>?, key: String): String? {
     return (data?.get(key) as? String)
@@ -238,6 +232,149 @@ private fun extractList(data: Map<String, Any>?, key: String): List<String> {
     }
 }
 
+@Suppress("UNCHECKED_CAST")
+private data class TravelerType(
+    val id: String,
+    val name: String,
+    val description: String,
+)
+
+@Suppress("UNCHECKED_CAST")
+private fun extractTravelerTypesList(data: Map<String, Any>?, key: String): List<TravelerType> {
+    val rawList = data?.get(key) as? List<Map<String, Any?>> ?: return emptyList()
+    return rawList.map { map ->
+        TravelerType(
+            id = map["id"]?.toString() ?: "",
+            name = map["name"]?.toString() ?: "",
+            description = map["description"]?.toString() ?: "",
+        )
+    }
+}
+
+@Composable
+private fun CityHeroCard(
+    cityName: String,
+    weather: String,
+    weatherStatus: String,
+    weatherIcon: String,
+    description: String,
+    buttonText: String,
+    onExploreCityClick: () -> Unit = { },
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .clickable { onExploreCityClick() },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+        ) {
+            Text(
+                text = cityName.uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "$weatherIcon $weather",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "$weatherStatus in $cityName",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { onExploreCityClick() },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = SageGreen),
+            ) {
+                Text(
+                    text = buttonText,
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TravelerTypesGrid(types: List<TravelerType>) {
+    Column(
+        modifier = Modifier.padding(horizontal = 24.dp),
+    ) {
+        types.chunked(2).forEach { row ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                row.forEach { type ->
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { },
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                text = type.name,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = type.description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                        }
+                    }
+                }
+                if (row.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
 @Suppress("UNCHECKED_CAST")
 private fun extractSpotList(data: Map<String, Any>?, key: String): List<com.mycityslow.app.domain.model.Spot> {
     val rawList = data?.get(key) as? List<*> ?: return emptyList()
@@ -348,7 +485,7 @@ private fun extractCategoryList(data: Map<String, Any>?, key: String): List<Cate
 }
 
 @Composable
-private fun CategoryChip(category: CategoryItem) {
+fun CategoryChip(category: CategoryItem) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -369,6 +506,53 @@ private fun CategoryChip(category: CategoryItem) {
 }
 
 @Composable
+private fun CategoriesGrid(categories: List<CategoryItem>) {
+    Column(
+        modifier = Modifier.padding(horizontal = 24.dp),
+    ) {
+        categories.chunked(2).forEach { row ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                row.forEach { category ->
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { },
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                text = category.icon,
+                                style = MaterialTheme.typography.headlineSmall,
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = category.name,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                        }
+                    }
+                }
+                if (row.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun SectionHeader(title: String, onSeeAll: () -> Unit = { }) {
     Row(
         modifier = Modifier
@@ -381,9 +565,10 @@ fun SectionHeader(title: String, onSeeAll: () -> Unit = { }) {
             text = title,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.SemiBold,
         )
         TextButton(onClick = onSeeAll) {
-            Text("See All", color = SageGreen)
+            Text("See All", color = SageGreen, style = MaterialTheme.typography.labelLarge)
         }
     }
 }
@@ -392,10 +577,10 @@ fun SectionHeader(title: String, onSeeAll: () -> Unit = { }) {
 @Composable
 fun ExperienceCard(
     experience: com.mycityslow.app.domain.model.Experience,
-    onClick: () -> Unit,
+    onClick: (String) -> Unit = { },
 ) {
     Card(
-        onClick = onClick,
+        onClick = { onClick(experience.id) },
         modifier = Modifier.width(260.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
@@ -415,7 +600,7 @@ fun ExperienceCard(
                     Surface(
                         shape = RoundedCornerShape(6.dp),
                         color = if (experience.isVerified) SageGreen.copy(alpha = 0.2f)
-                        else MaterialTheme.colorScheme.surfaceVariant,
+                        else MaterialTheme.colorScheme.surface,
                     ) {
                         Text(
                             text = experience.type,
@@ -427,7 +612,7 @@ fun ExperienceCard(
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "⭐ ${experience.rating}",
+                        text = "⭐ ${String.format("%.1f", experience.rating)}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -438,6 +623,7 @@ fun ExperienceCard(
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
+                    fontWeight = FontWeight.SemiBold,
                 )
                 Text(
                     text = "${experience.duration} · ${experience.priceRange}",
@@ -448,6 +634,8 @@ fun ExperienceCard(
                     text = "Hosted by ${experience.hostName}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -456,11 +644,15 @@ fun ExperienceCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FirstTimeGuideCard(cityName: String) {
+fun FirstTimeGuideCard(
+    cityName: String,
+    onNavigateGuide: () -> Unit = {},
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .clickable { onNavigateGuide() },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     ) {
@@ -473,6 +665,7 @@ fun FirstTimeGuideCard(cityName: String) {
                     text = "🧘 First Time in $cityName?",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.SemiBold,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -482,11 +675,11 @@ fun FirstTimeGuideCard(cityName: String) {
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
-                    onClick = { },
+                    onClick = { onNavigateGuide() },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = SageGreen),
                 ) {
-                    Text("View Guide")
+                    Text("View Guide", color = Color.White)
                 }
             }
             Text(

@@ -99,7 +99,37 @@ export const homeService = {
             { type: 'authentic_experiences', data: { experiences: authenticExperiences } },
             { type: 'first_time_guide', data: cityInfo ? { cityName: cityInfo.name } : null },
             { type: 'categories', data: { categories: CATEGORIES } },
-        ].filter(c => c.data !== null);
+        ].filter(c => c.data !== null).map(card => {
+            // Add titles for each section from backend
+                        if (!card.data) return card;
+            if (card.type === 'traveler_types') {
+                (card.data as any).title = 'Who Are You?';
+            } else if (card.type === 'trending_spots') {
+                (card.data as any).title = '🌿 Trending Peaceful Spots';
+            } else if (card.type === 'authentic_experiences') {
+                (card.data as any).title = '🏡 Authentic Experiences';
+            } else if (card.type === 'categories') {
+                (card.data as any).title = '🎯 Explore by Vibe';
+            }
+            return card;
+        });
+
+        // Add hero card for mobile with all visual content
+        if (cityInfo) {
+            cards.splice(1, 0, {
+                type: 'hero_card',
+                data: {
+                    cityName: cityInfo.name,
+                    citySlug: cityInfo.slug,
+                    weather: '24°C',
+                    weatherStatus: 'Clear Skies',
+                    weatherIcon: '☀️',
+                    description: 'Escape the noise in your own city.',
+                    buttonText: `Explore ${cityInfo.name} →`,
+                    backgroundImage: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2000&auto=format&fit=crop',
+                },
+            });
+        }
 
         // If platform is android, return cards-based format
         if (platform === 'android') {
