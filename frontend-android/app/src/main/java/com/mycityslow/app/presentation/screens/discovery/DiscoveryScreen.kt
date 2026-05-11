@@ -62,14 +62,14 @@ fun DiscoveryScreen(
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            val vibeOptions = listOf(null, "Calm", "Moderate", "Lively")
+            val vibeOptions = listOf(null to "All", "very-calm" to "Calm", "moderate" to "Moderate", "energetic" to "Lively")
             val currentVibe = state.filters.vibe
 
-            vibeOptions.forEach { vibe ->
+            vibeOptions.forEach { (vibeId, label) ->
                 VibeChip(
-                    label = vibe ?: "All",
-                    selected = currentVibe == vibe,
-                    onClick = { viewModel.setVibe(vibe) },
+                    label = label,
+                    selected = currentVibe == vibeId,
+                    onClick = { viewModel.setVibe(vibeId) },
                 )
             }
         }

@@ -69,6 +69,8 @@ interface ApiService {
     @GET("home")
     suspend fun getHomeData(
         @Query("city") city: String? = null,
+        @Query("lat") lat: Double? = null,
+        @Query("lng") lng: Double? = null,
     ): ApiResponseDto<HomeDataDto>
 
     // Stories

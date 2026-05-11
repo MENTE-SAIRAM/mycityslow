@@ -1,12 +1,17 @@
 package com.mycityslow.app.presentation.screens.home
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mycityslow.app.data.local.UserPreferencesStore
 import com.mycityslow.app.data.remote.ApiService
-import com.mycityslow.app.data.remote.dto.HomeCardDto
 import com.mycityslow.app.domain.model.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,27 +23,63 @@ data class HomeCard(
 
 data class HomeUiState(
     val greeting: String = "",
-    val currentCity: City? = null,
-    val trendingSpots: List<Spot> = emptyList(),
-    val authenticExperiences: List<Experience> = emptyList(),
-    val guides: List<CuratedGuide> = emptyList(),
-    val travelerTypes: List<String> = emptyList(),
     val cards: List<HomeCard> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null,
+    val hasLocation: Boolean = false,
 )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val api: ApiService,
     private val preferencesStore: UserPreferencesStore,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private var currentLat: Double? = null
+    private var currentLng: Double? = null
+
     init {
         loadHomeData()
+    }
+
+    fun onLocationGranted() {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        try {
+            val hasFineLocation = ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+            val hasCoarseLocation = ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (hasFineLocation || hasCoarseLocation) {
+                val provider = if (hasFineLocation) LocationManager.GPS_PROVIDER
+                else LocationManager.NETWORK_PROVIDER
+                val location = locationManager.getLastKnownLocation(provider)
+                if (location != null) {
+                    currentLat = location.latitude
+                    currentLng = location.longitude
+                    _uiState.update { it.copy(hasLocation = true) }
+                    loadHomeData()
+                } else {
+                    val allProviders = locationManager.getProviders(true)
+                    for (p in allProviders) {
+                        val loc = locationManager.getLastKnownLocation(p)
+                        if (loc != null) {
+                            currentLat = loc.latitude
+                            currentLng = loc.longitude
+                            _uiState.update { it.copy(hasLocation = true) }
+                            loadHomeData()
+                            break
+                        }
+                    }
+                }
+            }
+        } catch (_: Exception) {}
     }
 
     fun loadHomeData(citySlug: String? = null) {
@@ -47,7 +88,7 @@ class HomeViewModel @Inject constructor(
 
             try {
                 var slug = citySlug
-                if (slug == null) {
+                if (slug == null && currentLat == null) {
                     slug = preferencesStore.selectedCitySlug
                         .catch { emit(null) }
                         .firstOrNull()
@@ -55,7 +96,11 @@ class HomeViewModel @Inject constructor(
                         ?: "bengaluru"
                 }
 
-                val response = api.getHomeData(city = slug)
+                val response = api.getHomeData(
+                    city = slug,
+                    lat = currentLat,
+                    lng = currentLng,
+                )
                 val data = response.data
 
                 if (data == null) {

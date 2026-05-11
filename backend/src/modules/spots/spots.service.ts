@@ -111,7 +111,9 @@ export const spotsService = {
         }
 
         // Vibe, bestTime, crowdLevel filters
-        if (query.vibe) filter.vibe = query.vibe;
+        if (query.vibe) {
+            filter.vibe = { $regex: `^${query.vibe.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' };
+        }
         if (query.bestTime) filter.bestTime = query.bestTime;
         if (query.crowdLevel) filter.crowdLevel = query.crowdLevel;
 
@@ -126,7 +128,13 @@ export const spotsService = {
 
         // Text search
         if (query.search) {
-            filter.$text = { $search: query.search };
+            const escaped = query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            filter.$or = [
+                { title: { $regex: escaped, $options: 'i' } },
+                { description: { $regex: escaped, $options: 'i' } },
+                { tags: { $regex: escaped, $options: 'i' } },
+                { 'categories': { $regex: escaped, $options: 'i' } },
+            ];
         }
 
         // Geospatial — nearby (if lat/lng provided)

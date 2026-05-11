@@ -171,15 +171,6 @@ fun NavGraph(
                             restoreState = true
                         }
                     },
-                    onSeeAllExperiences = {
-                        navController.navigate(Screen.Experiences.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
                     onSeeAllCategories = {
                         navController.navigate(Screen.Discovery.route) {
                             popUpTo(navController.graph.findStartDestination().id) {

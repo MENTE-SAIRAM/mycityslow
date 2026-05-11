@@ -1,13 +1,9 @@
-// ─────────────────────────────────────────────────────────────
-// Home: Service — personalized home screen data
-// ─────────────────────────────────────────────────────────────
 import { Spot } from '../../models/Spot';
 import { City } from '../../models/City';
 import { Experience } from '../../models/Experience';
 import { CuratedGuide } from '../../models/CuratedGuide';
 import { GlobalSettings } from '../../models/GlobalSettings';
 
-// App categories for the home screen
 const CATEGORIES = [
     { id: 'parks', name: 'Parks & Gardens', icon: '🌳', color: '#4CAF50' },
     { id: 'trails', name: 'Walking Trails', icon: '🥾', color: '#8BC34A' },
@@ -20,39 +16,53 @@ const CATEGORIES = [
     { id: 'authentic-experiences', name: 'Authentic Experiences', icon: '🎭', color: '#E91E63' },
 ];
 
-export const homeService = {
-    /**
-     * Get personalized home data
-     */
-    async getHomeData(userCity?: string, platform?: string) {
-        const hour = new Date().getHours();
-        let greeting = 'Good morning';
-        if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
-        else if (hour >= 17 && hour < 21) greeting = 'Good evening';
-        else if (hour >= 21) greeting = 'Good night';
-
-        // Get user's city info (if provided)
-        let cityInfo = null;
-        let cityFilter: any = { isApproved: true };
-
-        if (userCity) {
-            const city = await City.findOne({ slug: userCity, isActive: true });
-            if (city) {
-                cityInfo = { name: city.name, slug: city.slug, state: city.state };
-                cityFilter.city = city._id;
-            }
+async function fetchWeather(lat: number, lng: number) {
+    try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.current_weather) {
+            const temp = Math.round(data.current_weather.temperature);
+            const code = data.current_weather.weathercode;
+            const icon = code < 3 ? '☀️' : code < 30 ? '⛅' : code < 50 ? '☁️' : '🌧️';
+            const status = code < 3 ? 'Clear Skies' : code < 30 ? 'Partly Cloudy' : code < 50 ? 'Cloudy' : 'Rainy';
+            return { temperature: `${temp}°C`, icon, status };
         }
+    } catch (_) {}
+    return { temperature: '24°C', icon: '☀️', status: 'Clear Skies' };
+}
 
-        // Trending spots (top 6 by peace score)
-        const trending = await Spot.find(cityFilter)
-            .populate('city', 'name slug')
-            .sort({ peaceScore: -1, isFeatured: -1 })
-            .limit(6);
+async function findNearestCity(lat: number, lng: number) {
+    try {
+        const city = await City.findOne({
+            location: {
+                $near: {
+                    $geometry: { type: 'Point', coordinates: [lng, lat] },
+                    $maxDistance: 50000,
+                },
+            },
+            isActive: true,
+        });
+        return city;
+    } catch (_) {
+        return null;
+    }
+}
 
-        // Recommended spots (random approved spots)
-        const recommended = await Spot.aggregate([
-            { $match: { isApproved: true } },
-            { $sample: { size: 6 } },
+async function getTrendingNearby(lat: number, lng: number, limit: number = 5) {
+    try {
+        const spots = await Spot.aggregate([
+            {
+                $geoNear: {
+                    near: { type: 'Point', coordinates: [lng, lat] },
+                    distanceField: 'distance',
+                    maxDistance: 15000,
+                    spherical: true,
+                    query: { isApproved: true },
+                },
+            },
+            { $sort: { peaceScore: -1 } },
+            { $limit: limit },
             {
                 $lookup: {
                     from: 'cities',
@@ -62,82 +72,113 @@ export const homeService = {
                 },
             },
             { $unwind: { path: '$city', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 1, title: 1, description: 1, slug: 1,
+                    images: 1, categories: 1, peaceScore: 1, vibe: 1,
+                    bestTime: 1, crowdLevel: 1, address: 1, tags: 1,
+                    entryFee: 1, timings: 1, openingHours: 1,
+                    travelerTypes: 1, isTouristFriendly: 1, localStory: 1,
+                    bestForTravelers: 1,
+                    location: 1,
+                    distanceKm: { $round: [{ $divide: ['$distance', 1000] }, 1] },
+                    'city.name': 1, 'city.slug': 1,
+                },
+            },
+        ]);
+        return spots;
+    } catch (_) {
+        return [];
+    }
+}
+
+export const homeService = {
+    async getHomeData(userCity?: string, platform?: string, lat?: number, lng?: number) {
+        const hour = new Date().getHours();
+        let greeting = 'Good morning';
+        if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
+        else if (hour >= 17 && hour < 21) greeting = 'Good evening';
+        else if (hour >= 21) greeting = 'Good night';
+
+        let cityInfo = null;
+        const cityFilter: any = { isApproved: true };
+
+        if (lat && lng) {
+            const nearestCity = await findNearestCity(lat, lng);
+            if (nearestCity) {
+                cityInfo = { name: nearestCity.name, slug: nearestCity.slug, state: nearestCity.state };
+                cityFilter.city = nearestCity._id;
+            }
+        }
+
+        if (!cityInfo && userCity) {
+            const city = await City.findOne({ slug: userCity, isActive: true });
+            if (city) {
+                cityInfo = { name: city.name, slug: city.slug, state: city.state };
+                cityFilter.city = city._id;
+            }
+        }
+
+        const [trendingProm, nearbyProm, weatherProm] = await Promise.all([
+            Spot.find(cityFilter)
+                .populate('city', 'name slug')
+                .sort({ peaceScore: -1, isFeatured: -1 })
+                .limit(5),
+            lat && lng ? getTrendingNearby(lat, lng, 5) : Promise.resolve([]),
+            lat && lng ? fetchWeather(lat, lng) : Promise.resolve({ temperature: '24°C', icon: '☀️', status: 'Clear Skies' }),
         ]);
 
-        // Authentic Experiences
-        const authenticExperiences = await Experience.find({ isApproved: true })
-            .populate('city', 'name slug')
-            .sort({ peaceScore: -1 })
-            .limit(6);
+        const weather = weatherProm;
+        const trending = trendingProm;
+        const nearby = nearbyProm;
 
-        // Curated Guides
-        const guides = await CuratedGuide.find({ isPublished: true })
-            .populate('city', 'name slug image')
-            .sort({ createdAt: -1 })
-            .limit(4);
+        const locationLabel = cityInfo ? cityInfo.name.toUpperCase() : 'YOUR CITY';
+        const cityName = cityInfo ? cityInfo.name : 'Your City';
 
-        // Traveler type highlights
-        const travelerTypes = [
-            { id: 'slow-traveler', name: 'Slow Traveler', description: 'Take time to immerse, never rush' },
-            { id: 'cultural-explorer', name: 'Cultural Explorer', description: 'Seek traditions, rituals, and local life' },
-            { id: 'foodie', name: 'Foodie', description: 'Travel for taste, crave authentic flavors' },
-            { id: 'photographer', name: 'Photographer', description: 'Frame stories through the lens' },
-            { id: 'wellness-seeker', name: 'Wellness Seeker', description: 'Find peace through yoga, meditation, nature' },
-            { id: 'solo-female', name: 'Solo Female', description: 'Travel independently, value safety & community' },
-            { id: 'history-lover', name: 'History Lover', description: 'Chase stories etched in stone and time' },
-        ];
-
-        // Get all active cities for the dropdown
         const cities = await City.find({ isActive: true }).select('name slug _id').sort({ name: 1 });
 
-        // Build cards array for platform-aware clients (Android)
         const cards: any[] = [
-            { type: 'greeting', data: { greeting } },
-            { type: 'city_info', data: cityInfo },
-            { type: 'traveler_types', data: { types: travelerTypes } },
-            { type: 'trending_spots', data: { spots: trending } },
-            { type: 'authentic_experiences', data: { experiences: authenticExperiences } },
-            { type: 'first_time_guide', data: cityInfo ? { cityName: cityInfo.name } : null },
-            { type: 'categories', data: { categories: CATEGORIES } },
-        ].filter(c => c.data !== null).map(card => {
-            // Add titles for each section from backend
-                        if (!card.data) return card;
-            if (card.type === 'traveler_types') {
-                (card.data as any).title = 'Who Are You?';
-                (card.data as any).seeAllText = 'See All';
-            } else if (card.type === 'trending_spots') {
-                (card.data as any).title = 'Trending Peaceful Spots';
-                (card.data as any).seeAllText = 'See All';
-            } else if (card.type === 'authentic_experiences') {
-                (card.data as any).title = 'Authentic Experiences';
-                (card.data as any).seeAllText = 'See All';
-            } else if (card.type === 'categories') {
-                (card.data as any).title = 'Explore by Vibe';
-                (card.data as any).seeAllText = 'See All';
-            }
-            return card;
-        });
-
-        // Add hero card for mobile with all visual content
-        if (cityInfo) {
-            cards.splice(1, 0, {
+            {
                 type: 'hero_card',
                 data: {
-                    cityName: cityInfo.name,
-                    citySlug: cityInfo.slug,
-                    locationLabel: cityInfo.name.toUpperCase(),
-                    weather: '24°C',
-                    weatherStatus: 'Clear Skies',
-                    weatherIcon: '☀️',
-                    description: 'Escape the noise in your own city.',
-                    buttonText: `Explore ${cityInfo.name} →`,
+                    cityName: cityName,
+                    citySlug: cityInfo?.slug || '',
+                    locationLabel,
+                    weather: weather.temperature,
+                    weatherStatus: weather.status,
+                    weatherIcon: weather.icon,
+                    description: 'Find your peace in the city.',
+                    buttonText: cityInfo ? `Explore ${cityName} →` : 'Explore Nearby →',
                     profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop',
                     backgroundImage: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2000&auto=format&fit=crop',
                 },
-            });
-        }
+            },
+            {
+                type: 'nearby_spots',
+                data: {
+                    title: 'Trending Nearby',
+                    seeAllText: 'See All',
+                    spots: nearby,
+                },
+            },
+            {
+                type: 'trending_spots',
+                data: {
+                    title: 'Peaceful Spots',
+                    seeAllText: 'See All',
+                    spots: trending,
+                },
+            },
+            {
+                type: 'categories',
+                data: {
+                    title: 'Explore by Vibe',
+                    seeAllText: 'See All',
+                    categories: CATEGORIES,
+                },
+            },
+        ];
 
-        // If platform is android, return cards-based format
         if (platform === 'android') {
             return {
                 success: true,
@@ -150,47 +191,17 @@ export const homeService = {
             };
         }
 
-        // Get dynamic settings
+        const authenticExperiences = await Experience.find({ isApproved: true })
+            .populate('city', 'name slug')
+            .sort({ peaceScore: -1 })
+            .limit(6);
+
+        const guides = await CuratedGuide.find({ isPublished: true })
+            .populate('city', 'name slug image')
+            .sort({ createdAt: -1 })
+            .limit(4);
+
         let settings = await GlobalSettings.findOne();
-        if (!settings) {
-            return {
-                success: true,
-                message: 'Success',
-                data: {
-                    greeting,
-                    cities,
-                    hero: {
-                        title: 'Find Peace in Your City',
-                        subtitle: 'Rediscover the rhythm of intentional living. Uncover hidden sanctuaries and quiet corners designed for your wellbeing.',
-                        backgroundImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=3000&auto=format&fit=crop',
-                        phoneImage: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=1000&auto=format&fit=crop'
-                    },
-                    philosophy: {
-                        title: 'Philosophy of Presence',
-                        subtitle: 'Why we advocate for a slower urban pace.',
-                        cards: [
-                            { title: 'Mental Clarity', description: 'Reducing noise and visual clutter allows your mind to rest and refocus on what truly matters in the present moment.', icon: 'sparkles' },
-                            { title: 'Heart Rate', description: 'We curate spaces with proven low-decibel environments and high vegetation to naturally lower physiological stress.', icon: 'heart' },
-                            { title: 'Urban Harmony', description: 'Fostering a deeper connection with the quiet natural elements that still exist within our bustling metropolitan homes.', icon: 'leaf' }
-                        ]
-                    },
-                    cta: {
-                        title: 'Ready to slow down?',
-                        subtitle: 'Join a community of 50,000+ urban dwellers finding their sanctuary in the city.',
-                        buttonText: 'Start Your Journey',
-                        image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop'
-                    },
-                    cityInfo,
-                    trending,
-                    recommended,
-                    authenticExperiences,
-                    guides,
-                    travelerTypes,
-                    categories: CATEGORIES,
-                    cards,
-                },
-            };
-        }
 
         return {
             success: true,
@@ -198,16 +209,31 @@ export const homeService = {
             data: {
                 greeting,
                 cities,
-                hero: settings.hero,
-                philosophy: settings.philosophy,
-                cta: settings.cta,
+                hero: settings?.hero || {
+                    title: 'Find Peace in Your City',
+                    subtitle: 'Rediscover the rhythm of intentional living.',
+                    backgroundImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=3000&auto=format&fit=crop',
+                    phoneImage: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=1000&auto=format&fit=crop',
+                },
+                philosophy: settings?.philosophy || {
+                    title: 'Philosophy of Presence',
+                    subtitle: 'Why we advocate for a slower urban pace.',
+                    cards: [
+                        { title: 'Mental Clarity', description: 'Reducing noise allows your mind to rest.', icon: 'sparkles' },
+                        { title: 'Heart Rate', description: 'Low-decibel environments lower stress.', icon: 'heart' },
+                        { title: 'Urban Harmony', description: 'Connect with nature in the city.', icon: 'leaf' },
+                    ],
+                },
+                cta: settings?.cta || {
+                    title: 'Ready to slow down?',
+                    subtitle: 'Join a community finding sanctuary in the city.',
+                    buttonText: 'Start Your Journey',
+                    image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop',
+                },
                 cityInfo,
                 trending,
-                recommended,
                 authenticExperiences,
                 guides,
-                travelerTypes,
-                categories: CATEGORIES,
                 cards,
             },
         };

@@ -6,6 +6,8 @@ import com.mycityslow.app.data.repository.SpotRepository
 import com.mycityslow.app.domain.model.DiscoveryFilters
 import com.mycityslow.app.domain.model.Spot
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,8 +29,7 @@ class DiscoveryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DiscoveryUiState())
     val uiState: StateFlow<DiscoveryUiState> = _uiState.asStateFlow()
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    private var searchJob: Job? = null
 
     init {
         loadSpots()
@@ -45,6 +46,7 @@ class DiscoveryViewModel @Inject constructor(
                         isLoading = false,
                         currentPage = 1,
                         hasMore = spots.size >= it.filters.limit,
+                        error = null,
                     )
                 }
             } catch (e: Exception) {
@@ -76,11 +78,6 @@ class DiscoveryViewModel @Inject constructor(
         }
     }
 
-    fun updateFilter(filter: DiscoveryFilters) {
-        _uiState.update { it.copy(filters = filter, error = null) }
-        loadSpots()
-    }
-
     fun setVibe(vibe: String?) {
         _uiState.update { it.copy(filters = it.filters.copy(vibe = vibe), error = null) }
         loadSpots()
@@ -102,8 +99,11 @@ class DiscoveryViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
-        _uiState.update { it.copy(filters = it.filters.copy(search = query.ifBlank { null })) }
-        loadSpots()
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            _uiState.update { it.copy(filters = it.filters.copy(search = query.ifBlank { null })) }
+            delay(400)
+            loadSpots()
+        }
     }
 }
