@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -169,6 +170,54 @@ fun HomeScreen(
                             }
                         }
                     }
+                    "hero_card" -> {
+                        item(key = "hero_card_$index") {
+                            val cityName = extractString(card.data, "cityName")
+                            val weather = extractString(card.data, "weather")
+                            val weatherStatus = extractString(card.data, "weatherStatus")
+                            val weatherIcon = extractString(card.data, "weatherIcon")
+                            val description = extractString(card.data, "description")
+                            val buttonText = extractString(card.data, "buttonText")
+
+                            if (cityName != null) {
+                                CityHeroCard(
+                                    cityName = cityName,
+                                    weather = weather ?: "",
+                                    weatherStatus = weatherStatus ?: "",
+                                    weatherIcon = weatherIcon ?: "",
+                                    description = description ?: "",
+                                    buttonText = buttonText ?: "",
+                                    onExploreCityClick = { onCityClick(cityName) }
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
+                    }
+                    "greeting" -> {
+                        item(key = "greeting_$index") {
+                            val greeting = extractString(card.data, "greeting")
+                            if (!greeting.isNullOrBlank()) {
+                                Text(
+                                    text = greeting,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                                )
+                            }
+                        }
+                    }
+                    "traveler_types" -> {
+                        item(key = "traveler_types_$index") {
+                            val types = extractTravelerTypesList(card.data, "types")
+                            val title = extractString(card.data, "title")
+                            if (types.isNotEmpty() && !title.isNullOrBlank()) {
+                                SectionHeader(title = title, onSeeAll = { })
+                                TravelerTypesGrid(types)
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -176,43 +225,6 @@ fun HomeScreen(
         item { Spacer(modifier = Modifier.height(16.dp)) }
     }
 }
-                    "hero_card" -> {
-                        item(key = "city_info_$index") {
-                            val cityName = extractString(card.data, "cityName")
-                            val citySlug = extractString(card.data, "citySlug")
-                            val weather = extractString(card.data, "weather")
-                            val weatherStatus = extractString(card.data, "weatherStatus")
-                            val weatherIcon = extractString(card.data, "weatherIcon")
-                            val description = extractString(card.data, "description")
-                            val buttonText = extractString(card.data, "buttonText")
-                            if (cityName != null) {
-                                CityHeroCard(
-                                    cityName = cityName,
-                                    weather = weather ?: "24°C",
-                                    weatherStatus = weatherStatus ?: "Clear Skies",
-                                    weatherIcon = weatherIcon ?: "☀️",
-                                    description = description ?: "Escape the noise in your own city.",
-                                    buttonText = buttonText ?: "Explore $cityName →",
-                                    onExploreCityClick = { /* Navigate to city */ }
-                                )
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
-                        }
-                    }
-                    "greeting" -> {
-                        // Greeting is handled in backend cards
-                    }
-                    "traveler_types" -> {
-                        item(key = "traveler_types_$index") {
-                            val types = extractTravelerTypesList(card.data, "types")
-                                                        val title = extractString(card.data, "title") ?: "Who Are You?"
-                            if (types.isNotEmpty()) {
-                                SectionHeader(title = title, onSeeAll = { })
-                                TravelerTypesGrid(types)
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
-                        }
-                    }
 
 private fun extractString(data: Map<String, Any>?, key: String): String? {
     return (data?.get(key) as? String)
@@ -485,7 +497,7 @@ private fun extractCategoryList(data: Map<String, Any>?, key: String): List<Cate
 }
 
 @Composable
-fun CategoryChip(category: CategoryItem) {
+private fun CategoryChip(category: CategoryItem) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
