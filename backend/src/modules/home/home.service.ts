@@ -146,8 +146,8 @@ export const homeService = {
         const trending = trendingProm;
         const nearby = nearbyProm;
 
-        const locationLabel = cityInfo ? cityInfo.name.toUpperCase() : 'YOUR CITY';
-        const cityName = cityInfo ? cityInfo.name : 'Your City';
+        const locationLabel = cityInfo ? cityInfo.name.toUpperCase() : 'Discover';
+        const cityName = cityInfo ? cityInfo.name : '';
 
         const cities = await City.find({ isActive: true }).select('name slug _id').sort({ name: 1 });
 
@@ -162,19 +162,22 @@ export const homeService = {
                     weatherStatus: weather.status,
                     weatherIcon: weather.icon,
                     description: 'Find your peace in the city.',
-                    buttonText: cityInfo ? `Explore ${cityName} →` : 'Explore Nearby →',
-                    profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop',
+                    buttonText: cityInfo ? `Explore ${cityName} →` : 'Discover More',
                     backgroundImage: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2000&auto=format&fit=crop',
                 },
             },
-            {
+        ];
+
+        if (nearby.length > 0) {
+            cards.push({
                 type: 'nearby_spots',
                 data: {
                     title: 'Trending Nearby',
                     seeAllText: 'See All',
                     spots: nearby,
                 },
-            },
+            });
+        }
             {
                 type: 'trending_spots',
                 data: {

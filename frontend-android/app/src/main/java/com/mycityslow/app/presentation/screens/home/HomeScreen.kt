@@ -5,13 +5,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -127,7 +125,6 @@ fun HomeScreen(
                 HomeTopBar(
                     locationLabel = extractString(heroCard, "locationLabel").orEmpty(),
                     greeting = state.greeting,
-                    profileImageUrl = extractString(heroCard, "profileImage").orEmpty(),
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -309,7 +306,6 @@ private data class CategoryItem(
 private fun HomeTopBar(
     locationLabel: String,
     greeting: String,
-    profileImageUrl: String,
 ) {
     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -328,27 +324,12 @@ private fun HomeTopBar(
             )
         }
         Spacer(modifier = Modifier.height(2.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = greeting,
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Medium,
-            )
-            AsyncImage(
-                model = profileImageUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
-                contentScale = ContentScale.Crop,
-            )
-        }
+        Text(
+            text = greeting,
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Medium,
+        )
     }
 }
 
