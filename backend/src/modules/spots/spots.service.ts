@@ -53,7 +53,7 @@ export const spotsService = {
 
     /**
      * Android mobile card data payload (all cards in one endpoint)
-     * Platform-restricted: only for Android clients
+     * Platform-agnostic: for iOS and Android clients
      */
     getMobileCardData() {
         return {

@@ -50,21 +50,9 @@ export const discoveryController = {
         }
     },
 
-    /** GET /api/discovery/spots/mobile/card-data — Android-only card payloads (platform-restricted) */
+    /** GET /api/discovery/spots/mobile/card-data — Mobile card payloads (iOS & Android) */
     async getMobileCardData(req: Request, res: Response, next: NextFunction) {
         try {
-            const userAgent = Array.isArray(req.headers['user-agent'])
-                ? req.headers['user-agent'][0]
-                : (req.headers['user-agent'] || '');
-            const platform = Array.isArray(req.headers['x-platform'])
-                ? req.headers['x-platform'][0]
-                : (req.headers['x-platform'] || '');
-            const isAndroid = userAgent.toLowerCase().includes('android') || platform.toLowerCase() === 'android';
-
-            if (!isAndroid) {
-                return res.status(403).json({ success: false, message: 'Android only' });
-            }
-
             const cardData = spotsService.getMobileCardData();
             res.json(cardData);
         } catch (error) {
