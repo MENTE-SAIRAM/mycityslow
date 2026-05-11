@@ -31,6 +31,21 @@ interface ApiService {
     @GET("discovery/spots/{id}")
     suspend fun getSpotById(@Path("id") id: String): ApiResponseDto<SpotDto>
 
+    @GET("discovery/spots/mobile/ui-text")
+    suspend fun getSpotDetailUiText(): ApiResponseDto<SpotDetailUiTextDto>
+
+    @GET("discovery/spots/mobile/card-data")
+    suspend fun getMobileCardData(): ApiResponseDto<MobileCardDataDto>
+
+    @GET("spots/nearby")
+    suspend fun getNearbySpots(
+        @Query("lat") lat: Double,
+        @Query("lng") lng: Double,
+        @Query("radius") radius: Double = 8.0,
+        @Query("limit") limit: Int = 10,
+        @Query("page") page: Int = 1,
+    ): ApiResponseDto<PaginatedResponseDto<SpotDto>>
+
     // Experiences
     @GET("experiences")
     suspend fun getExperiences(
@@ -64,6 +79,11 @@ interface ApiService {
         @Query("limit") limit: Int = 20,
     ): ApiResponseDto<StoriesResponseDto>
 
+    @GET("stories/spot/{spotId}")
+    suspend fun getStoriesBySpot(
+        @Path("spotId") spotId: String,
+    ): ApiResponseDto<SpotStoriesResponseDto>
+
     // Guides
     @GET("guides")
     suspend fun getGuides(): ApiResponseDto<GuidesResponseDto>
@@ -80,4 +100,8 @@ interface ApiService {
     // Collection / Saved (requires auth)
     @GET("collection")
     suspend fun getSavedSpots(): ApiResponseDto<PaginatedResponseDto<SpotDto>>
+
+    // Navigation Menu
+    @GET("menu")
+    suspend fun getNavigationMenu(): MenuResponseDto
 }

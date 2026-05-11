@@ -59,11 +59,12 @@ export default function Navbar() {
             className={`sticky top-0 z-[120] isolate w-full transition-all duration-500 ${
                 scrolled ? 'py-2' : 'py-5'
             }`}
+            style={{ borderTop: '3px solid transparent', borderImage: 'linear-gradient(90deg, var(--color-sage), var(--color-terra), var(--color-sage-light)) 1' }}
         >
             <div className="max-w-7xl mx-auto px-6">
                 <div 
-                    className={`flex justify-between items-center px-8 py-4 rounded-full transition-all duration-500 border border-white/10 ${
-                        scrolled ? 'glass bg-dark-bg/80 backdrop-blur-2xl shadow-premium' : 'bg-dark-card/85 backdrop-blur-xl shadow-sm'
+                    className={`flex justify-between items-center px-8 py-4 rounded-full transition-all duration-500 border border-sage/15 ${
+                        scrolled ? 'glass bg-dark-bg/90 backdrop-blur-2xl shadow-premium' : 'bg-dark-card/90 backdrop-blur-xl shadow-sm border-sage/10'
                     }`}
                 >
                     {/* Logo */}
@@ -82,11 +83,11 @@ export default function Navbar() {
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className={`text-base font-bold transition-all hover:text-sage-light ${
-                                    isActive(link.path)
-                                        ? 'text-sage-light underline decoration-2 underline-offset-8'
-                                        : 'text-white/70'
-                                }`}
+                                        className={`text-base font-bold transition-all hover:text-sage-light ${
+                                            isActive(link.path)
+                                                ? 'text-sage-light underline decoration-2 underline-offset-8'
+                                                : 'text-sage/70 hover:text-sage'
+                                        }`}
                             >
                                 {link.name}
                             </Link>
@@ -105,8 +106,8 @@ export default function Navbar() {
                                 </button>
 
                                 {showDropdown && (
-                                    <div className="absolute right-0 mt-4 w-60 glass rounded-3xl shadow-premium border border-white/10 py-2 z-50 overflow-hidden">
-                                        <div className="px-6 py-4 border-b border-white/5">
+                                    <div className="absolute right-0 mt-4 w-60 glass rounded-3xl shadow-premium border border-sage/15 py-2 z-50 overflow-hidden">
+                                        <div className="px-6 py-4 border-b border-sage/10">
                                             <p className="text-sm font-extrabold truncate text-white">{user.name}</p>
                                             <p className="text-[10px] text-sage-light uppercase tracking-widest truncate mt-1 font-bold">{user.email}</p>
                                         </div>
@@ -142,24 +143,24 @@ export default function Navbar() {
                 </div>
 
                 {showMobileMenu && (
-                    <div className="md:hidden mt-3 rounded-3xl border border-white/10 bg-dark-card/95 backdrop-blur-md shadow-premium px-5 py-5">
+                    <div className="md:hidden mt-3 rounded-3xl border border-sage/15 bg-dark-card/95 backdrop-blur-md shadow-premium px-5 py-5">
                         <div className="flex flex-col gap-3">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.name}
                                     to={link.path}
-                                    className={`px-3 py-2 rounded-xl text-sm font-bold transition-all ${
-                                        isActive(link.path)
-                                            ? 'bg-sage/20 text-sage-light'
-                                            : 'text-white/80 hover:bg-white/5 hover:text-white'
-                                    }`}
+                                        className={`px-3 py-2 rounded-xl text-sm font-bold transition-all ${
+                                            isActive(link.path)
+                                                ? 'bg-sage/20 text-sage-light'
+                                                : 'text-sage/70 hover:bg-sage/10 hover:text-sage-light'
+                                        }`}
                                 >
                                     {link.name}
                                 </Link>
                             ))}
                         </div>
 
-                        <div className="mt-5 pt-4 border-t border-white/10">
+                        <div className="mt-5 pt-4 border-t border-sage/15">
                             {user ? (
                                 <div className="space-y-3">
                                     <div className="px-3">

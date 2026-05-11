@@ -1,7 +1,11 @@
 package com.mycityslow.app.presentation.navigation
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,6 +21,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.mycityslow.app.data.local.UserPreferencesStore
+import com.mycityslow.app.navigation.DeepLinkHandler
+import com.mycityslow.app.presentation.components.navigation.MyCitySlowTopAppBar
 import com.mycityslow.app.presentation.screens.discovery.DiscoveryScreen
 import com.mycityslow.app.presentation.screens.experiences.ExperiencesScreen
 import com.mycityslow.app.presentation.screens.home.HomeScreen
@@ -25,6 +31,7 @@ import com.mycityslow.app.presentation.screens.onboarding.OnboardingCityScreen
 import com.mycityslow.app.presentation.screens.onboarding.OnboardingInterestsScreen
 import com.mycityslow.app.presentation.screens.onboarding.OnboardingWelcomeScreen
 import com.mycityslow.app.presentation.screens.spotdetail.SpotDetailScreen
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,52 +55,67 @@ fun NavGraph(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val showBottomBar = currentRoute in bottomNavItems.map { it.route }
+    val showTopBar = showBottomBar // Show top bar when bottom bar is shown (main screens)
 
-    Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                ) {
-                    bottomNavItems.forEach { item ->
-                        val selected = currentRoute == item.route
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .systemBarsPadding()) {
+        // Top App Bar with Menu
+        if (showTopBar) {
+            MyCitySlowTopAppBar(
+                onMenuClick = {
+                    // TODO: Handle drawer opening
+                    // You can integrate drawer here if needed
+                }
+            )
+        }
+
+        Scaffold(
+            modifier = Modifier.weight(1f),
+            bottomBar = {
+                if (showBottomBar) {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        bottomNavItems.forEach { item ->
+                            val selected = currentRoute == item.route
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = item.icon,
-                                    contentDescription = item.label,
-                                )
-                            },
-                            label = { Text(item.label) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            ),
-                        )
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = item.label,
+                                    )
+                                },
+                                label = { Text(item.label) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                ),
+                            )
+                        }
                     }
                 }
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { paddingValues ->
-        NavHost(
-            navController = navController,
-            startDestination = startDestination,
-            modifier = Modifier.padding(paddingValues),
-        ) {
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+        ) { paddingValues ->
+            NavHost(
+                navController = navController,
+                startDestination = startDestination,
+                modifier = Modifier.padding(paddingValues),
+            ) {
             // Onboarding
             composable(
                 route = Screen.Onboarding.route,
@@ -207,9 +229,13 @@ fun NavGraph(
                 val id = backStackEntry.arguments?.getString("id") ?: ""
                 SpotDetailScreen(
                     spotId = id,
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onOpenSpot = { nextId ->
+                        navController.navigate(Screen.SpotDetail.createRoute(nextId))
+                    }
                 )
             }
+        }
         }
     }
 }

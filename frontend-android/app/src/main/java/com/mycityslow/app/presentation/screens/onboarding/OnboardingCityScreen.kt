@@ -13,12 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
 import coil.compose.AsyncImage
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
+import com.mycityslow.app.R
 import com.mycityslow.app.data.local.UserPreferencesStore
 import com.mycityslow.app.presentation.theme.DeepForest
 import com.mycityslow.app.domain.model.City
@@ -53,8 +56,20 @@ fun OnboardingCityScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = 48.dp),
+            .padding(top = 24.dp),
     ) {
+        // App Logo
+        Image(
+            painter = painterResource(id = R.drawable.logo_icon),
+            contentDescription = "My City Slow Logo",
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "Choose Your City",
             style = MaterialTheme.typography.headlineMedium,

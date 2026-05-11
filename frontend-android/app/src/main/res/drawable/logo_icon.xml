@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp"
+    android:height="192dp"
+    android:viewportWidth="192"
+    android:viewportHeight="192">
+
+    <!-- Circular background (Sage Green for icon) -->
+    <path
+        android:fillColor="#A8C4B0"
+        android:pathData="M96,6 C148.6,6 192,49.4 192,102 C192,154.6 148.6,198 96,198 C43.4,198 0,154.6 0,102 C0,49.4 43.4,6 96,6 Z" />
+
+    <!-- Inner circle (slightly lighter) -->
+    <path
+        android:fillColor="#B8D4C0"
+        android:pathData="M96,15 C143.6,15 183,54.4 183,102 C183,149.6 143.6,189 96,189 C48.4,189 9,149.6 9,102 C9,54.4 48.4,15 96,15 Z" />
+
+    <!-- Window frame (white/cream with sage border) -->
+    <path
+        android:strokeColor="#F5F0E8"
+        android:strokeWidth="2"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M48,45 L144,45 L144,135 L48,135 Z" />
+
+    <!-- Vertical divider -->
+    <path
+        android:strokeColor="#F5F0E8"
+        android:strokeWidth="1"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M96,45 L96,135" />
+
+    <!-- Horizontal divider -->
+    <path
+        android:strokeColor="#F5F0E8"
+        android:strokeWidth="1"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M48,90 L144,90" />
+
+    <!-- Top left pane (sky) -->
+    <path
+        android:fillColor="#E8F0EB"
+        android:pathData="M49,46 L95,46 L95,89 L49,89 Z" />
+
+    <!-- Top right pane (darker sky) -->
+    <path
+        android:fillColor="#D8E8E0"
+        android:pathData="M97,46 L143,46 L143,89 L97,89 Z" />
+
+    <!-- Bottom left: Tree -->
+    <!-- Tree trunk (deep forest) -->
+    <path
+        android:fillColor="#3D5A3D"
+        android:pathData="M68,85 L72,85 L71,110 L69,110 Z" />
+
+    <!-- Tree foliage (sage green) -->
+    <path
+        android:fillColor="#A8C4B0"
+        android:pathData="M70,60 C76,60 80,65 80,72 L80,85 L60,85 L60,72 C60,65 64,60 70,60 Z" />
+
+    <!-- Tree depth layer -->
+    <path
+        android:fillColor="#8BB3A0"
+        android:pathData="M70,52 C75,52 78,55 78,60 L78,68 L62,68 L62,60 C62,55 65,52 70,52 Z" />
+
+    <!-- Person sitting -->
+    <!-- Head (terracotta accent) -->
+    <path
+        android:fillColor="#C17C5E"
+        android:pathData="M65,95 C65,93 67,91 69,91 C71,91 73,93 73,95 C73,97 71,99 69,99 C67,99 65,97 65,95 Z" />
+
+    <!-- Body -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M65,99 L73,99 L73,110 L70,112 L65,110 Z" />
+
+    <!-- Bottom right: City minimal -->
+    <!-- Building -->
+    <path
+        android:fillColor="#6B7A6B"
+        android:pathData="M100,100 L105,100 L105,120 L100,120 Z" />
+
+    <!-- Window -->
+    <path
+        android:fillColor="#F5F0E8"
+        android:pathData="M101,105 L104,105 L104,108 L101,108 Z" />
+
+    <!-- Building 2 -->
+    <path
+        android:fillColor="#7A8A7A"
+        android:pathData="M110,95 L115,95 L115,120 L110,120 Z" />
+
+    <!-- Window -->
+    <path
+        android:fillColor="#F5F0E8"
+        android:pathData="M111,100 L114,100 L114,103 L111,103 Z" />
+
+    <!-- Accent dot (terracotta) -->
+    <path
+        android:fillColor="#C17C5E"
+        android:pathData="M125,60 C125,58 126.1,57 127.5,57 C128.9,57 130,58 130,60 C130,61 128.9,62 127.5,62 C126.1,62 125,61 125,60 Z" />
+
+</vector>

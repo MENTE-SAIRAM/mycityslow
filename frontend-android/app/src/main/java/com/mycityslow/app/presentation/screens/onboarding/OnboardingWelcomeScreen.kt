@@ -9,9 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import com.mycityslow.app.R
 import com.mycityslow.app.presentation.theme.SageGreen
 import com.mycityslow.app.presentation.theme.WarmBeige
 
@@ -45,7 +48,16 @@ fun OnboardingWelcomeScreen(onGetStarted: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        // App Logo
+        Image(
+            painter = painterResource(id = R.drawable.logo_icon),
+            contentDescription = "My City Slow Logo",
+            modifier = Modifier
+                .size(120.dp)
+                .clip(RoundedCornerShape(24.dp))
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Page content
         Column(

@@ -5,9 +5,9 @@ import { authenticate } from '../../middleware/auth';
 const router = Router();
 
 router.get('/', localStoriesController.getAll);
-router.get('/:id', localStoriesController.getById);
 router.get('/spot/:spotId', localStoriesController.getBySpot);
 router.get('/experience/:experienceId', localStoriesController.getByExperience);
+router.get('/:id', localStoriesController.getById);
 
 router.post('/', authenticate, localStoriesController.create);
 router.post('/:id/like', authenticate, localStoriesController.like);

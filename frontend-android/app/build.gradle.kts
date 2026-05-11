@@ -7,17 +7,10 @@ plugins {
 }
 
 val mapsApiKey: String by lazy {
-    val localProps = rootProject.file("local.properties")
-    if (localProps.exists()) {
-        val lines = localProps.readLines()
-        for (line in lines) {
-            val trimmed = line.trim()
-            if (trimmed.startsWith("MAPS_API_KEY=")) {
-                return@lazy trimmed.substringAfter("=").trim()
-            }
-        }
-    }
-    project.findProperty("MAPS_API_KEY")?.toString() ?: "YOUR_GOOGLE_MAPS_API_KEY"
+    rootProject.file("local.properties").takeIf { it.exists() }?.let { file ->
+        file.readLines().firstOrNull { it.trim().startsWith("MAPS_API_KEY=") }
+            ?.substringAfter("=")?.trim()
+    } ?: "YOUR_GOOGLE_MAPS_API_KEY"
 }
 
 android {
@@ -35,6 +28,7 @@ android {
         vectorDrawables { useSupportLibrary = true }
 
         buildConfigField("String", "API_BASE_URL", "\"https://mycityslow.onrender.com/api/\"")
+        buildConfigField("String", "MAPS_API_KEY", "\"${mapsApiKey}\"")
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

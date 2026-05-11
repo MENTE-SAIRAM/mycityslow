@@ -13,9 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import com.mycityslow.app.R
 import com.mycityslow.app.data.local.UserPreferencesStore
 import com.mycityslow.app.presentation.theme.SageGreen
 import com.mycityslow.app.presentation.theme.Terracotta
@@ -50,8 +54,20 @@ fun OnboardingInterestsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = 48.dp),
+            .padding(top = 24.dp),
     ) {
+        // App Logo
+        Image(
+            painter = painterResource(id = R.drawable.logo_main),
+            contentDescription = "My City Slow Logo",
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "What's Your Travel Vibe?",
             style = MaterialTheme.typography.headlineMedium,

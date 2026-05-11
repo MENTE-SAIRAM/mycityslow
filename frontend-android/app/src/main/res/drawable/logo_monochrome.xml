@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Note: This is monochrome version - set fillColor as needed per background:
+         For light backgrounds: use dark gray #2C4A2B (Deep Forest)
+         For dark backgrounds: use light cream #F5F0E8 (Warm Beige)
+         Or override at runtime via tint -->
+
+    <!-- Background circle (transparent - allows for any background) -->
+    <!-- Left empty for flexibility -->
+
+    <!-- Window frame (monochrome) -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="2.5"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M55,50 L145,50 L145,140 L55,140 Z" />
+
+    <!-- Window middle divider (vertical) -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M100,50 L100,140" />
+
+    <!-- Window middle divider (horizontal) -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="1.5"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M55,95 L145,95" />
+
+    <!-- LEFT PANE TOP: Tree silhouette -->
+    <!-- Tree trunk -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M75,88 L79,88 L78,118 L76,118 Z" />
+
+    <!-- Tree foliage (darker for depth) -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M77,63 C85,63 90,68 90,78 L90,88 L64,88 L64,78 C64,68 69,63 77,63 Z" />
+
+    <!-- Tree foliage upper layer -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M77,53 C83,53 87,56 87,63 L87,70 L67,70 L67,63 C67,56 71,53 77,53 Z" />
+
+    <!-- Person sitting under tree -->
+    <!-- Head -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M72,108 C72,106 74,104 76,104 C78,104 80,106 80,108 C80,110 78,112 76,112 C74,112 72,110 72,108 Z" />
+
+    <!-- Body (sitting) -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M72,112 L80,112 L80,126 L76,128 L72,126 Z" />
+
+    <!-- LEFT PANE BOTTOM: Accent line (representing serenity) -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="1.2"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M68,85 Q66,83 65,85" />
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="1.2"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M84,85 Q86,83 87,85" />
+
+    <!-- RIGHT PANE TOP: Empty space (suggests sky/openness) -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M108,60 L140,60" />
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M108,70 L135,70" />
+
+    <!-- RIGHT PANE BOTTOM: City skyline (monochrome) -->
+    <!-- Building 1 -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M105,108 L110,108 L110,128 L105,128 Z" />
+
+    <!-- Building 1 window (outline only) -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M106,113 L109,113 L109,116 L106,116 Z" />
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M106,118 L109,118 L109,121 L106,121 Z" />
+
+    <!-- Building 2 -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M115,103 L120,103 L120,128 L115,128 Z" />
+
+    <!-- Building 2 window -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M116,108 L119,108 L119,111 L116,111 Z" />
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M116,116 L119,116 L119,119 L116,119 Z" />
+
+    <!-- Building 3 (tallest) -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M125,98 L130,98 L130,128 L125,128 Z" />
+
+    <!-- Building 3 windows -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M126,103 L129,103 L129,106 L126,106 Z" />
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M126,111 L129,111 L129,114 L126,114 Z" />
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M126,119 L129,119 L129,122 L126,122 Z" />
+
+    <!-- Subtle accent mark (lotus/leaf hint) -->
+    <path
+        android:fillColor="#2C4A2B"
+        android:pathData="M135,63 Q138,58 140,63 Q138,68 135,63 Z" />
+
+    <!-- Bottom ground line -->
+    <path
+        android:strokeColor="#2C4A2B"
+        android:strokeWidth="0.8"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M55,138 L145,138" />
+
+</vector>

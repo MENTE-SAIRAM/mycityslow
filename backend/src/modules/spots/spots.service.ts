@@ -25,6 +25,71 @@ interface DiscoveryQuery {
 
 export const spotsService = {
     /**
+     * Mobile spot detail UI text payload with all card data
+     */
+    getMobileSpotDetailUiText() {
+        return {
+            sectionBestTimeForSilence: 'Best Time for Silence',
+            sectionHowToReach: 'How to Reach',
+            sectionNearbySimilarSpots: 'Nearby Similar Spots',
+            peaceScoreLabel: 'PEACE SCORE',
+            peaceScoreSuffix: '/10',
+            vibeLabelPrefix: 'Vibe:',
+            bestTimeLabelPrefix: 'Best:',
+            bestTimeInsightText: 'Morning hours offer 95% noise reduction compared to city average.',
+            bestTimeChartLabels: ['12P', '4P', '8P', '6A', '8A', '10A'],
+            bestTimeChartHeights: [24, 20, 14, 72, 58, 30],
+            bestTimeChartHighlightIndex: 3,
+            mapFallbackDistanceLabel: 'Map view',
+            distanceAwayTemplate: '{value} km away',
+            distanceChipTemplate: '{value} km',
+            nearbyFallbackDistanceLabel: 'Nearby',
+            noNearbySpotsText: 'No nearby spots available yet.',
+            addToSlowListText: 'Add to My Slow List',
+            addedToSlowListText: 'Added to My Slow List',
+            startWalkingText: 'Start Walking',
+        };
+    },
+
+    /**
+     * Android mobile card data payload (all cards in one endpoint)
+     * Platform-restricted: only for Android clients
+     */
+    getMobileCardData() {
+        return {
+            peaceScoreCard: {
+                label: 'PEACE SCORE',
+                suffix: '/10',
+                icon: 'explore',
+            },
+            bestTimeCard: {
+                title: 'Best Time for Silence',
+                chartLabels: ['12P', '4P', '8P', '6A', '8A', '10A'],
+                chartHeights: [24, 20, 14, 72, 58, 30],
+                highlightIndex: 3,
+                insightText: 'Morning hours offer 95% noise reduction compared to city average.',
+                vibeLabelPrefix: 'Vibe:',
+                bestTimeLabelPrefix: 'Best:',
+            },
+            mapCard: {
+                title: 'How to Reach',
+                fallbackLabel: 'Map view',
+                distanceTemplate: '{value} km away',
+            },
+            nearbySpotsCard: {
+                title: 'Nearby Similar Spots',
+                distanceTemplate: '{value} km',
+                emptyText: 'No nearby spots available yet.',
+            },
+            bottomBar: {
+                addToListText: 'Add to My Slow List',
+                addedToListText: 'Added to My Slow List',
+                startWalkingText: 'Start Walking',
+            },
+        };
+    },
+
+    /**
      * Discovery feed — filtered spots with pagination
      */
     async discoverSpots(query: DiscoveryQuery) {

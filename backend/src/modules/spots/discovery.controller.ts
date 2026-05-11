@@ -40,6 +40,38 @@ export const discoveryController = {
         }
     },
 
+    /** GET /api/discovery/spots/mobile/ui-text — mobile UI copy payload */
+    async getMobileUiText(req: Request, res: Response, next: NextFunction) {
+        try {
+            const uiText = spotsService.getMobileSpotDetailUiText();
+            res.json(uiText);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    /** GET /api/discovery/spots/mobile/card-data — Android-only card payloads (platform-restricted) */
+    async getMobileCardData(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userAgent = Array.isArray(req.headers['user-agent'])
+                ? req.headers['user-agent'][0]
+                : (req.headers['user-agent'] || '');
+            const platform = Array.isArray(req.headers['x-platform'])
+                ? req.headers['x-platform'][0]
+                : (req.headers['x-platform'] || '');
+            const isAndroid = userAgent.toLowerCase().includes('android') || platform.toLowerCase() === 'android';
+
+            if (!isAndroid) {
+                return res.status(403).json({ success: false, message: 'Android only' });
+            }
+
+            const cardData = spotsService.getMobileCardData();
+            res.json(cardData);
+        } catch (error) {
+            next(error);
+        }
+    },
+
     /** GET /api/discovery/spots/filters — metadata for filters */
     async getFilters(req: Request, res: Response, next: NextFunction) {
         try {

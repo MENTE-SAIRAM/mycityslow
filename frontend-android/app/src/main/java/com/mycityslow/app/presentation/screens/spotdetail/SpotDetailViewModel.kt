@@ -15,6 +15,9 @@ data class SpotDetailUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val isSaved: Boolean = false,
+    val nearbySpots: List<SpotRepository.NearbySpotPreview> = emptyList(),
+    val uiText: SpotRepository.SpotDetailUiText = SpotRepository.SpotDetailUiText(),
+    val cardData: SpotRepository.MobileCardData = SpotRepository.MobileCardData(),
 )
 
 @HiltViewModel
@@ -36,14 +39,40 @@ class SpotDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
+                val uiText = runCatching { spotRepository.getSpotDetailUiText() }
+                    .getOrDefault(SpotRepository.SpotDetailUiText())
+                
+                val cardData = runCatching { spotRepository.getMobileCardData() }
+                    .getOrDefault(SpotRepository.MobileCardData())
+
                 val spot = spotRepository.getSpotById(spotId)
                 val saved = spot?.id?.let { spotRepository.isSpotSaved(it) } ?: false
+
+                val nearby = if (spot != null && (spot.location.lat != 0.0 || spot.location.lng != 0.0)) {
+                    runCatching {
+                        spotRepository.getNearbySpots(
+                            lat = spot.location.lat,
+                            lng = spot.location.lng,
+                            currentSpotId = spot.id,
+                        )
+                    }.getOrDefault(emptyList())
+                } else {
+                    emptyList()
+                }
+
                 _uiState.update {
-                    it.copy(spot = spot, isLoading = false, isSaved = saved)
+                    it.copy(
+                        spot = spot,
+                        isLoading = false,
+                        isSaved = saved,
+                        nearbySpots = nearby,
+                        uiText = uiText,
+                        cardData = cardData,
+                    )
                 }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, error = e.message ?: "Failed to load spot")
+                    it.copy(isLoading = false, error = e.message)
                 }
             }
         }

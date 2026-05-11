@@ -97,6 +97,95 @@ data class SpotDto(
     @SerializedName("isTouristFriendly") val isTouristFriendly: Boolean?,
     @SerializedName("localStory") val localStory: String?,
     @SerializedName("bestForTravelers") val bestForTravelers: List<String>?,
+    @SerializedName("distanceKm") val distanceKm: Double?,
+    @SerializedName("distanceMeters") val distanceMeters: Double?,
+)
+
+data class StoryAuthorDto(
+    @SerializedName("name") val name: String?,
+    @SerializedName("avatar") val avatar: String?,
+)
+
+data class SpotStoryDto(
+    @SerializedName("_id") val id: String?,
+    @SerializedName("id") val idAlt: String?,
+    @SerializedName("title") val title: String?,
+    @SerializedName("content") val content: String?,
+    @SerializedName("authorName") val authorName: String?,
+    @SerializedName("authorImage") val authorImage: String?,
+    @SerializedName("author") val author: StoryAuthorDto?,
+    @SerializedName("images") val images: List<String>?,
+    @SerializedName("imageUrl") val imageUrl: String?,
+    @SerializedName("createdAt") val createdAt: String?,
+)
+
+data class SpotStoriesResponseDto(
+    @SerializedName("stories") val stories: List<SpotStoryDto>?,
+)
+
+data class SpotDetailUiTextDto(
+    @SerializedName("sectionBestTimeForSilence") val sectionBestTimeForSilence: String?,
+    @SerializedName("sectionHowToReach") val sectionHowToReach: String?,
+    @SerializedName("sectionCommunityPerspective") val sectionCommunityPerspective: String?,
+    @SerializedName("sectionNearbySimilarSpots") val sectionNearbySimilarSpots: String?,
+    @SerializedName("peaceScoreLabel") val peaceScoreLabel: String?,
+    @SerializedName("peaceScoreSuffix") val peaceScoreSuffix: String?,
+    @SerializedName("vibeLabelPrefix") val vibeLabelPrefix: String?,
+    @SerializedName("bestTimeLabelPrefix") val bestTimeLabelPrefix: String?,
+    @SerializedName("bestTimeInsightText") val bestTimeInsightText: String?,
+    @SerializedName("bestTimeChartLabels") val bestTimeChartLabels: List<String>?,
+    @SerializedName("bestTimeChartHeights") val bestTimeChartHeights: List<Int>?,
+    @SerializedName("bestTimeChartHighlightIndex") val bestTimeChartHighlightIndex: Int?,
+    @SerializedName("mapFallbackDistanceLabel") val mapFallbackDistanceLabel: String?,
+    @SerializedName("distanceAwayTemplate") val distanceAwayTemplate: String?,
+    @SerializedName("distanceChipTemplate") val distanceChipTemplate: String?,
+    @SerializedName("nearbyFallbackDistanceLabel") val nearbyFallbackDistanceLabel: String?,
+    @SerializedName("noNearbySpotsText") val noNearbySpotsText: String?,
+    @SerializedName("addToSlowListText") val addToSlowListText: String?,
+    @SerializedName("addedToSlowListText") val addedToSlowListText: String?,
+    @SerializedName("startWalkingText") val startWalkingText: String?,
+)
+
+data class MobileCardDataDto(
+    @SerializedName("peaceScoreCard") val peaceScoreCard: PeaceScoreCardDto?,
+    @SerializedName("bestTimeCard") val bestTimeCard: BestTimeCardDto?,
+    @SerializedName("mapCard") val mapCard: MapCardDto?,
+    @SerializedName("nearbySpotsCard") val nearbySpotsCard: NearbySpotsCardDto?,
+    @SerializedName("bottomBar") val bottomBar: BottomBarDto?,
+)
+
+data class PeaceScoreCardDto(
+    @SerializedName("label") val label: String?,
+    @SerializedName("suffix") val suffix: String?,
+    @SerializedName("icon") val icon: String?,
+)
+
+data class BestTimeCardDto(
+    @SerializedName("title") val title: String?,
+    @SerializedName("chartLabels") val chartLabels: List<String>?,
+    @SerializedName("chartHeights") val chartHeights: List<Int>?,
+    @SerializedName("highlightIndex") val highlightIndex: Int?,
+    @SerializedName("insightText") val insightText: String?,
+    @SerializedName("vibeLabelPrefix") val vibeLabelPrefix: String?,
+    @SerializedName("bestTimeLabelPrefix") val bestTimeLabelPrefix: String?,
+)
+
+data class MapCardDto(
+    @SerializedName("title") val title: String?,
+    @SerializedName("fallbackLabel") val fallbackLabel: String?,
+    @SerializedName("distanceTemplate") val distanceTemplate: String?,
+)
+
+data class NearbySpotsCardDto(
+    @SerializedName("title") val title: String?,
+    @SerializedName("distanceTemplate") val distanceTemplate: String?,
+    @SerializedName("emptyText") val emptyText: String?,
+)
+
+data class BottomBarDto(
+    @SerializedName("addToListText") val addToListText: String?,
+    @SerializedName("addedToListText") val addedToListText: String?,
+    @SerializedName("startWalkingText") val startWalkingText: String?,
 )
 
 data class ExperienceDto(
