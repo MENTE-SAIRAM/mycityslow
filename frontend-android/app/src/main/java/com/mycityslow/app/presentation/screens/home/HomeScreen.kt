@@ -216,14 +216,14 @@ private fun HomeTopBar(
             Icon(
                 imageVector = Icons.Outlined.LocationOn,
                 contentDescription = null,
-                tint = Color(0xFF8A8A83),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(14.dp),
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = locationLabel,
                 style = MaterialTheme.typography.labelMedium,
-                color = Color(0xFF6C6C66),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Medium,
             )
         }
@@ -238,7 +238,7 @@ private fun HomeTopBar(
             Text(
                 text = greeting,
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color(0xFF141414),
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Medium,
             )
 
@@ -248,7 +248,7 @@ private fun HomeTopBar(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .border(1.dp, Color(0xFFCFCEC8), CircleShape),
+                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
                 contentScale = ContentScale.Crop,
             )
         }
@@ -357,7 +357,7 @@ private fun FigmaTrendingSpotCard(
         onClick = onClick,
         modifier = Modifier.width(282.dp),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F1EC)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column {
             Box {
@@ -376,12 +376,12 @@ private fun FigmaTrendingSpotCard(
                         .align(Alignment.TopEnd)
                         .padding(10.dp),
                     shape = CircleShape,
-                    color = Color(0xFFEDEAE2),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.BookmarkBorder,
                         contentDescription = null,
-                        tint = Color(0xFF42423E),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .padding(8.dp)
                             .size(18.dp),
@@ -393,7 +393,7 @@ private fun FigmaTrendingSpotCard(
                 Text(
                     text = spot.name,
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFF1E1E1A),
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.SemiBold,
@@ -403,14 +403,14 @@ private fun FigmaTrendingSpotCard(
                     Icon(
                         imageVector = Icons.Outlined.NearMe,
                         contentDescription = null,
-                        tint = Color(0xFF76766F),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(14.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = if (spot.location.lat != 0.0 || spot.location.lng != 0.0) "Nearby" else "",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF76766F),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
@@ -418,13 +418,13 @@ private fun FigmaTrendingSpotCard(
                     items((spot.tags.ifEmpty { listOf(spot.category) }).take(2)) { tag ->
                         Surface(
                             shape = RoundedCornerShape(20.dp),
-                            color = Color(0xFFD4E5D5),
+                            color = SageGreen.copy(alpha = 0.2f),
                         ) {
                             Text(
                                 text = tag.uppercase(),
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color(0xFF3D5C4D),
+                                color = SageGreen,
                             )
                         }
                     }
@@ -596,7 +596,7 @@ private fun extractCategoryList(data: Map<String, Any>?, key: String): List<Cate
 private fun CategoryChip(category: CategoryItem) {
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = MaterialTheme.colorScheme.surface,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -631,7 +631,7 @@ private fun CategoriesGrid(categories: List<CategoryItem>) {
                             .weight(1f)
                             .clickable { },
                         shape = RoundedCornerShape(22.dp),
-                        color = Color(0xFFF3F1EC),
+                        color = MaterialTheme.colorScheme.surface,
                     ) {
                         Column(
                             modifier = Modifier
@@ -652,7 +652,7 @@ private fun CategoriesGrid(categories: List<CategoryItem>) {
                             Text(
                                 text = category.name,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = Color(0xFF1E1E1A),
+                                color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Center,
                                 maxLines = 2,
                                 fontWeight = FontWeight.Medium,
@@ -697,14 +697,14 @@ fun SectionHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.headlineSmall,
-            color = Color(0xFF1C1C19),
+            color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Medium,
         )
         if (!seeAllText.isNullOrBlank()) {
             TextButton(onClick = onSeeAll) {
                 Text(
                     text = seeAllText,
-                    color = Color(0xFF2E5A45),
+                    color = SageGreen,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
